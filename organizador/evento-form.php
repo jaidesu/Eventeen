@@ -334,7 +334,7 @@ renderManagementStart(
         </div>
         <div class="management-field">
             <label for="vagas-evento">Limite de participantes <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-            <input id="vagas-evento" name="capacidade" class="management-input" type="number" min="1" step="1" required value="<?= h($valores['capacidade']) ?>">
+            <input id="vagas-evento" name="capacidade" class="management-input" type="number" min="1" max="4294967295" step="1" required value="<?= h($valores['capacidade']) ?>">
             <?php if ($evento !== null): ?><small class="management-muted"><?= $inscritos ?> inscrição(ões) ativa(s); a capacidade não pode ficar abaixo desse número.</small><?php endif; ?>
         </div>
         <div class="management-field">

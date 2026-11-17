@@ -4,7 +4,7 @@ require __DIR__ . '/config.php';
 require_once __DIR__ . '/includes/certificados.php';
 
 $codigoRecebido = $_GET['codigo'] ?? '';
-$codigo = is_string($codigoRecebido) ? trim($codigoRecebido) : '';
+$codigo = is_string($codigoRecebido) ? mb_substr(trim($codigoRecebido), 0, 24, 'UTF-8') : '';
 $certificado = $codigo !== '' ? buscarCertificadoPorCodigo($pdo, $codigo) : null;
 ?>
 <!DOCTYPE html>

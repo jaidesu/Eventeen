@@ -81,6 +81,84 @@ function requisicaoHttps(): bool
         || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https' && appConfig('forcar_https'));
 }
 
+/*
+ * Limites de tamanho das entradas (proteção contra envio de dados excessivos).
+ * O banco e cada formulário têm limites próprios; estes valem para qualquer requisição.
+ */
+const REQUISICAO_TAMANHO_MAXIMO = 1048576;   // 1 MB por requisição (não há envio de arquivos)
+const CAMPO_TAMANHO_MAXIMO = 65535;          // maior campo do banco (TEXT)
+const ENTRADA_PROFUNDIDADE_MAXIMA = 2;       // ex.: rateios[3] ou participantes[]
+const ENTRADA_ITENS_MAXIMOS = 900;           // valores somados de GET e POST (abaixo do max_input_vars padrão, 1000)
+const SENHA_TAMANHO_MINIMO = 8;
+const SENHA_TAMANHO_MAXIMO = 64;             // senhas novas (o bcrypt considera até 72 bytes)
+const SENHA_LOGIN_TAMANHO_MAXIMO = 128;      // senhas digitadas para entrar
+const BUSCA_TAMANHO_MAXIMO = 100;
+
+/** Recusa requisições com corpo grande demais ou campos fora dos limites, antes de qualquer processamento. */
+function validarTamanhoRequisicao(): void
+{
+    if (PHP_SAPI === 'cli') {
+        return;
+    }
+    $excesso = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0) > REQUISICAO_TAMANHO_MAXIMO;
+    // Ao atingir max_input_vars o PHP descarta o excedente em silêncio: trata-se como excesso.
+    $limiteItens = min(ENTRADA_ITENS_MAXIMOS, max(1, (int) ini_get('max_input_vars')) - 1);
+    $itens = 0;
+    $verificar = static function (array $valores, int $nivel) use (&$verificar, &$itens, $limiteItens): bool {
+        foreach ($valores as $chave => $valor) {
+            $itens++;
+            if ($itens > $limiteItens || strlen((string) $chave) > 100) {
+                return false;
+            }
+            if (is_array($valor)) {
+                if ($nivel >= ENTRADA_PROFUNDIDADE_MAXIMA || !$verificar($valor, $nivel + 1)) {
+                    return false;
+                }
+            } elseif (strlen((string) $valor) > CAMPO_TAMANHO_MAXIMO) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+    if ($excesso || !$verificar($_GET, 0) || !$verificar($_POST, 0)) {
+        http_response_code(413);
+        header('Content-Type: text/html; charset=UTF-8');
+        exit('<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Dados grandes demais | Eventeen</title></head>'
+            . '<body style="font-family:system-ui,sans-serif;max-width:32rem;margin:15vh auto;padding:0 1rem">'
+            . '<h1 style="color:#c0172d">Dados grandes demais</h1>'
+            . '<p>O formulário enviado excede o tamanho permitido. Volte, revise os campos e tente novamente.</p></body></html>');
+    }
+}
+
+validarTamanhoRequisicao();
+
+/** Texto de busca: aparado e cortado no tamanho máximo, sem erro para o usuário. */
+function termoDeBusca(mixed $valor): string
+{
+    return is_string($valor) ? mb_substr(trim($valor), 0, BUSCA_TAMANHO_MAXIMO, 'UTF-8') : '';
+}
+
+/** Valida uma senha nova; devolve a mensagem de erro ou null quando está aceitável. */
+function erroNovaSenha(string $senha, string $confirmacao): ?string
+{
+    $tamanho = mb_strlen($senha, 'UTF-8');
+    if ($tamanho < SENHA_TAMANHO_MINIMO || $tamanho > SENHA_TAMANHO_MAXIMO || strlen($senha) > 72) {
+        return 'A senha deve ter entre ' . SENHA_TAMANHO_MINIMO . ' e ' . SENHA_TAMANHO_MAXIMO . ' caracteres.';
+    }
+    if ($senha !== $confirmacao) {
+        return 'A confirmação não corresponde à nova senha.';
+    }
+
+    return null;
+}
+
+/** Atributos HTML padronizados para campos de senha nova. */
+function atributosSenhaNova(): string
+{
+    return 'minlength="' . SENHA_TAMANHO_MINIMO . '" maxlength="' . SENHA_TAMANHO_MAXIMO . '"';
+}
+
 error_reporting(E_ALL);
 ini_set('log_errors', '1');
 if (appEmProducao()) {
@@ -236,7 +314,7 @@ function codigoOrganizadorValido(string $codigoInformado): bool
 {
     $codigoEsperado = trim((string) appConfig('codigo_organizador'));
 
-    return $codigoEsperado !== '' && hash_equals($codigoEsperado, trim($codigoInformado));
+    return $codigoEsperado !== '' && strlen($codigoInformado) <= 256 && hash_equals($codigoEsperado, trim($codigoInformado));
 }
 
 /** Aviso exibido no início dos formulários com campos obrigatórios. */

@@ -195,7 +195,7 @@ renderManagementStart(
                 </div>
                 <div class="management-field">
                     <label for="valor-patrocinio">Valor acordado (R$) <span class="management-muted">(somente apoio financeiro)</span></label>
-                    <input class="management-input" id="valor-patrocinio" name="valor" inputmode="decimal" placeholder="5000,00">
+                    <input class="management-input" id="valor-patrocinio" name="valor" maxlength="16" inputmode="decimal" placeholder="5000,00">
                 </div>
                 <div class="management-field management-field--full">
                     <label for="descricao-patrocinio">Recurso oferecido <span class="campo-obrigatorio">(obrigatório para apoio material ou institucional)</span></label>

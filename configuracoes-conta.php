@@ -70,12 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $novaSenha = (string) ($_POST['nova_senha'] ?? '');
         $confirmacao = (string) ($_POST['confirmar_senha'] ?? '');
 
-        if (!password_verify($senhaAtual, $dadosConta['senha_hash'])) {
+        if (strlen($senhaAtual) > SENHA_LOGIN_TAMANHO_MAXIMO * 4 || !password_verify($senhaAtual, $dadosConta['senha_hash'])) {
             $erro = 'A senha atual está incorreta.';
-        } elseif (strlen($novaSenha) < 8) {
-            $erro = 'A nova senha deve ter pelo menos 8 caracteres.';
-        } elseif ($novaSenha !== $confirmacao) {
-            $erro = 'A confirmação não corresponde à nova senha.';
+        } elseif (($erroSenha = erroNovaSenha($novaSenha, $confirmacao)) !== null) {
+            $erro = $erroSenha;
         } else {
             $novoHash = password_hash($novaSenha, PASSWORD_DEFAULT);
             $atualizar = $pdo->prepare('UPDATE usuarios SET senha_hash = :senha_hash WHERE id = :id');
@@ -167,16 +165,16 @@ $prefixo = applicationRootPrefix();
                     <?php renderRequiredFieldsNote(); ?>
                     <div class="campo">
                         <label for="senha-atual">Senha atual <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                        <input type="password" id="senha-atual" name="senha_atual" autocomplete="current-password" required>
+                        <input type="password" id="senha-atual" name="senha_atual" maxlength="<?= SENHA_LOGIN_TAMANHO_MAXIMO ?>" autocomplete="current-password" required>
                     </div>
                     <div class="campo">
                         <label for="nova-senha">Nova senha <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                        <input type="password" id="nova-senha" name="nova_senha" autocomplete="new-password" minlength="8" aria-describedby="senha-ajuda" required>
-                        <small id="senha-ajuda" class="ajuda">Use pelo menos 8 caracteres.</small>
+                        <input type="password" id="nova-senha" name="nova_senha" autocomplete="new-password" <?= atributosSenhaNova() ?> aria-describedby="senha-ajuda" required>
+                        <small id="senha-ajuda" class="ajuda">Use de <?= SENHA_TAMANHO_MINIMO ?> a <?= SENHA_TAMANHO_MAXIMO ?> caracteres.</small>
                     </div>
                     <div class="campo">
                         <label for="confirmar-senha">Confirmar nova senha <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                        <input type="password" id="confirmar-senha" name="confirmar_senha" autocomplete="new-password" minlength="8" required>
+                        <input type="password" id="confirmar-senha" name="confirmar_senha" autocomplete="new-password" <?= atributosSenhaNova() ?> required>
                     </div>
                     <div class="account-settings-card__footer">
                         <a class="account-back-link" href="<?= h($prefixo . profileHomePath((string) $dadosConta['perfil'])) ?>">Voltar ao início</a>

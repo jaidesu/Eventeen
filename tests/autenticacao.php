@@ -100,7 +100,7 @@ try {
     $pdo->prepare("DELETE FROM tentativas_acesso WHERE tipo = 'recuperacao' AND email = :email")->execute(['email' => $email]);
     $pedido = solicitarRedefinicaoSenha($pdo, $email, $ip);
 
-    $esperarRejeicao(fn () => redefinirSenhaComToken($pdo, $pedido['token'], 'curta', 'curta'), 'pelo menos 8');
+    $esperarRejeicao(fn () => redefinirSenhaComToken($pdo, $pedido['token'], 'curta', 'curta'), 'entre 8 e 64');
     $esperarRejeicao(fn () => redefinirSenhaComToken($pdo, $pedido['token'], 'nova-senha-1', 'outra-senha'), 'confirmação');
 
     // A troca libera o login bloqueado e o link vale uma única vez.
@@ -126,6 +126,18 @@ try {
     $assert(limiteInatividadeSessao('organizador', true) === 12 * 3600, 'Organizador com "manter conectado": no máximo 12 horas.');
     $assert(limiteInatividadeSessao('administrador', true) === 12 * 3600, 'Administrador com "manter conectado": no máximo 12 horas.');
     $assert(assinaturaSenha('a') !== assinaturaSenha('b'), 'Senhas diferentes deveriam ter assinaturas diferentes.');
+
+    // Limites de tamanho das entradas.
+    $assert(erroNovaSenha(str_repeat('a', 8), str_repeat('a', 8)) === null, 'Senha de 8 caracteres deveria ser aceita.');
+    $assert(erroNovaSenha(str_repeat('a', 64), str_repeat('a', 64)) === null, 'Senha de 64 caracteres deveria ser aceita.');
+    $assert(erroNovaSenha(str_repeat('a', 65), str_repeat('a', 65)) !== null, 'Senha acima de 64 caracteres deveria ser recusada.');
+    $assert(erroNovaSenha(str_repeat('😀', 20), str_repeat('😀', 20)) !== null, 'Senha acima de 72 bytes deveria ser recusada.');
+    $assert(erroNovaSenha('senha-boa-1', 'senha-boa-2') === 'A confirmação não corresponde à nova senha.', 'Confirmação diferente deveria ser apontada.');
+    $assert(mb_strlen(termoDeBusca(str_repeat('ç', 5000)), 'UTF-8') === BUSCA_TAMANHO_MAXIMO, 'A busca deveria ser cortada no limite.');
+    $assert(termoDeBusca(['x']) === '' && termoDeBusca('  abc  ') === 'abc', 'A busca deveria ignorar listas e espaços.');
+    $esperarRejeicao(fn () => autenticarUsuario($pdo, $email, str_repeat('x', 100000), $ip), 'E-mail ou senha incorretos');
+    $pdo->prepare("DELETE FROM tentativas_acesso WHERE tipo = 'login' AND email = :email")->execute(['email' => $email]);
+    $assert(!codigoOrganizadorValido(str_repeat('F', 100000)), 'Código gigante deveria ser recusado.');
 
     // Cadastro de organizador: exige o código configurado.
     $codigo = (string) appConfig('codigo_organizador');

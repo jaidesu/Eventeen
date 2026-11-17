@@ -2,8 +2,8 @@
 declare(strict_types=1);
 require __DIR__ . '/../config.php';
 $usuario = requireRole('participante');
-$termo = trim((string) ($_GET['q'] ?? ''));
-$categoria = trim((string) ($_GET['categoria'] ?? ''));
+$termo = termoDeBusca($_GET['q'] ?? '');
+$categoria = mb_substr(termoDeBusca($_GET['categoria'] ?? ''), 0, 80, 'UTF-8');
 
 $categorias = $pdo->query(
     "SELECT DISTINCT categoria FROM eventos
@@ -48,7 +48,7 @@ $eventos = $consulta->fetchAll();
             <form class="app-toolbar" method="get" action="eventos.php">
                 <label class="app-search">
                     <span aria-hidden="true">⌕</span>
-                    <input type="search" name="q" value="<?= h($termo) ?>" placeholder="Buscar por nome, descrição ou local" aria-label="Buscar eventos">
+                    <input type="search" name="q" maxlength="<?= BUSCA_TAMANHO_MAXIMO ?>" value="<?= h($termo) ?>" placeholder="Buscar por nome, descrição ou local" aria-label="Buscar eventos">
                     <?php if ($categoria !== ''): ?><input type="hidden" name="categoria" value="<?= h($categoria) ?>"><?php endif; ?>
                     <button type="submit">Buscar</button>
                 </label>

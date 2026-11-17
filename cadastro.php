@@ -22,14 +22,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!in_array($perfil, ['participante', 'organizador'], true)) {
         $erro = 'Selecione se deseja se cadastrar como participante ou organizador.';
-    } elseif ($nome === '' || strlen($nome) > 150 || !$email || strlen($email) > 190) {
+    } elseif ($nome === '' || mb_strlen($nome, 'UTF-8') > 150 || !$email || mb_strlen($email, 'UTF-8') > 190) {
         $erro = 'Informe um nome e um e-mail válidos.';
-    } elseif (strlen($matricula) > 40) {
+    } elseif (mb_strlen($matricula, 'UTF-8') > 40) {
         $erro = 'A matrícula deve ter no máximo 40 caracteres.';
-    } elseif (strlen($senha) < 8) {
-        $erro = 'A senha deve ter pelo menos 8 caracteres.';
-    } elseif ($senha !== $confirmacao) {
-        $erro = 'As senhas não coincidem.';
+    } elseif (($erroSenha = erroNovaSenha($senha, $confirmacao)) !== null) {
+        $erro = $erroSenha;
     } elseif (!isset($_POST['termos'])) {
         $erro = 'É necessário concordar com os termos de uso.';
     } elseif ($perfil === 'organizador' && !codigoOrganizadorValido($codigoOrganizador)) {
@@ -107,35 +105,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div id="painel-organizador" class="cadastro-painel" role="tabpanel" aria-labelledby="aba-organizador" <?= $perfil !== 'organizador' ? 'hidden' : '' ?>>
                     <div class="campo">
                         <label for="codigo-organizador">Código de organizador <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                        <input type="text" id="codigo-organizador" name="codigo_organizador" autocomplete="off" placeholder="Digite o código de acesso" <?= $perfil === 'organizador' ? 'required' : 'disabled' ?>>
+                        <input type="text" id="codigo-organizador" name="codigo_organizador" maxlength="64" autocomplete="off" placeholder="Digite o código de acesso" <?= $perfil === 'organizador' ? 'required' : 'disabled' ?>>
                         <small class="ajuda">Necessário para criar uma conta de organizador.</small>
                     </div>
                 </div>
 
                 <div class="campo">
                     <label for="nome">Nome completo <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                    <input type="text" id="nome" name="nome" autocomplete="name" placeholder="Digite seu nome completo" required>
+                    <input type="text" id="nome" name="nome" maxlength="150" autocomplete="name" placeholder="Digite seu nome completo" required>
                 </div>
 
                 <div class="campo">
                     <label for="email">E-mail <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                    <input type="email" id="email" name="email" autocomplete="email" placeholder="seuemail@exemplo.com" required>
+                    <input type="email" id="email" name="email" maxlength="190" autocomplete="email" placeholder="seuemail@exemplo.com" required>
                 </div>
 
                 <div class="campo" id="campo-matricula" <?= $perfil === 'organizador' ? 'hidden' : '' ?>>
                     <label for="matricula">Matrícula <span class="opcional">(opcional)</span></label>
-                    <input type="text" id="matricula" name="matricula" autocomplete="off" placeholder="Digite sua matrícula" <?= $perfil === 'organizador' ? 'disabled' : '' ?>>
+                    <input type="text" id="matricula" name="matricula" maxlength="40" autocomplete="off" placeholder="Digite sua matrícula" <?= $perfil === 'organizador' ? 'disabled' : '' ?>>
                 </div>
 
                 <div class="campo">
                     <label for="senha">Senha <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                    <input type="password" id="senha" name="senha" autocomplete="new-password" minlength="8" placeholder="Crie uma senha" aria-describedby="senha-ajuda" required>
-                    <small id="senha-ajuda" class="ajuda">Use pelo menos 8 caracteres.</small>
+                    <input type="password" id="senha" name="senha" autocomplete="new-password" <?= atributosSenhaNova() ?> placeholder="Crie uma senha" aria-describedby="senha-ajuda" required>
+                    <small id="senha-ajuda" class="ajuda">Use de <?= SENHA_TAMANHO_MINIMO ?> a <?= SENHA_TAMANHO_MAXIMO ?> caracteres.</small>
                 </div>
 
                 <div class="campo">
                     <label for="confirmar-senha">Confirmar senha <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                    <input type="password" id="confirmar-senha" name="confirmar-senha" autocomplete="new-password" minlength="8" placeholder="Digite sua senha novamente" required>
+                    <input type="password" id="confirmar-senha" name="confirmar-senha" autocomplete="new-password" <?= atributosSenhaNova() ?> placeholder="Digite sua senha novamente" required>
                 </div>
 
                 <label class="checkbox-linha checkbox-linha--termos" for="termos">

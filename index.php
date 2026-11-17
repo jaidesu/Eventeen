@@ -70,12 +70,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php renderRequiredFieldsNote(); ?>
                 <div class="campo">
                     <label for="email">E-mail <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                    <input type="email" id="email" name="email" autocomplete="email" placeholder="seuemail@exemplo.com" value="<?= h($emailInformado) ?>" required>
+                    <input type="email" id="email" name="email" maxlength="190" autocomplete="email" placeholder="seuemail@exemplo.com" value="<?= h($emailInformado) ?>" required>
                 </div>
 
                 <div class="campo">
                     <label for="senha">Senha <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                    <input type="password" id="senha" name="senha" autocomplete="current-password" placeholder="Digite sua senha" required>
+                    <input type="password" id="senha" name="senha" maxlength="<?= SENHA_LOGIN_TAMANHO_MAXIMO ?>" autocomplete="current-password" placeholder="Digite sua senha" required>
                     <a class="link-auxiliar" href="esqueci-senha.php">Esqueci minha senha</a>
                 </div>
 

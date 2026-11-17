@@ -221,7 +221,7 @@ renderManagementStart(
                     <input type="hidden" name="atividade_id" value="<?= (int) $atividadeSelecionada['id'] ?>">
                     <input type="hidden" name="acao" value="registrar_lote">
                     <label class="management-check-all"><input type="checkbox" id="marcar-todos"> Selecionar todos os pendentes</label>
-                    <input class="management-search" type="search" id="filtro-participantes" placeholder="Filtrar por nome ou e-mail" aria-label="Filtrar participantes">
+                    <input class="management-search" type="search" id="filtro-participantes" maxlength="<?= BUSCA_TAMANHO_MAXIMO ?>" placeholder="Filtrar por nome ou e-mail" aria-label="Filtrar participantes">
                     <button class="management-button" type="submit">Registrar presença dos selecionados</button>
                 </form>
             <?php endif; ?>

@@ -16,7 +16,6 @@ const RECUPERACAO_PEDIDOS_POR_EMAIL = 3;
 const RECUPERACAO_PEDIDOS_POR_IP = 10;
 const RECUPERACAO_JANELA_MINUTOS = 60;
 const REDEFINICAO_VALIDADE_MINUTOS = 60;
-const SENHA_TAMANHO_MINIMO = 8;
 
 function ipCliente(): string
 {
@@ -82,7 +81,7 @@ function limparTentativasAcesso(PDO $pdo, string $tipo, string $email): void
  */
 function autenticarUsuario(PDO $pdo, string $email, string $senha, string $ip): array
 {
-    $emailNormalizado = normalizarEmailAcesso($email);
+    $emailNormalizado = mb_substr(normalizarEmailAcesso($email), 0, 190, 'UTF-8');
     $espera = minutosBloqueioAcesso($pdo, 'login', $emailNormalizado, $ip);
     if ($espera > 0) {
         throw new DomainException(sprintf(
@@ -98,6 +97,9 @@ function autenticarUsuario(PDO $pdo, string $email, string $senha, string $ip): 
 
     // Sem conta, a senha é conferida contra um hash fixo para que o tempo de
     // resposta não revele quais e-mails estão cadastrados.
+    if (strlen($senha) > SENHA_LOGIN_TAMANHO_MAXIMO * 4) {
+        $usuario = false;
+    }
     $hash = $usuario ? (string) $usuario['senha_hash'] : '$2y$10$hVv6oddOFG1ClRdLx8CmdO0ws0UXswiJ.bzrZSh1in4.nUdMkp2Z6';
     if (!password_verify($senha, $hash) || !$usuario) {
         registrarTentativaAcesso($pdo, 'login', $email, $ip);
@@ -191,11 +193,9 @@ function usuarioDoTokenRedefinicao(PDO $pdo, string $token): ?array
 /** Troca a senha usando um link de redefinição; o link vale uma única vez. */
 function redefinirSenhaComToken(PDO $pdo, string $token, string $novaSenha, string $confirmacao): array
 {
-    if (strlen($novaSenha) < SENHA_TAMANHO_MINIMO) {
-        throw new DomainException('A nova senha deve ter pelo menos ' . SENHA_TAMANHO_MINIMO . ' caracteres.');
-    }
-    if ($novaSenha !== $confirmacao) {
-        throw new DomainException('A confirmação não corresponde à nova senha.');
+    $erroSenha = erroNovaSenha($novaSenha, $confirmacao);
+    if ($erroSenha !== null) {
+        throw new DomainException($erroSenha);
     }
     $linkInvalido = 'Este link de redefinição é inválido, já foi usado ou expirou. Solicite um novo.';
     if (!tokenRedefinicaoBemFormado($token)) {

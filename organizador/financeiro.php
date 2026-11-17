@@ -210,7 +210,7 @@ $rotulosPagamento = ['pendente' => 'Pendente', 'confirmado' => 'Confirmado', 'es
                                             <input type="hidden" name="evento_id" value="<?= $eventoId ?>">
                                             <input type="hidden" name="acao" value="pagamento_registrar">
                                             <input type="hidden" name="inscricao_id" value="<?= (int) $pagamento['inscricao_id'] ?>">
-                                            <input class="management-input" name="valor" inputmode="decimal" required value="<?= h(number_format($valorInscricao, 2, ',', '')) ?>" aria-label="Valor pago (obrigatório)" size="8">
+                                            <input class="management-input" name="valor" maxlength="16" inputmode="decimal" required value="<?= h(number_format($valorInscricao, 2, ',', '')) ?>" aria-label="Valor pago (obrigatório)" size="8">
                                             <span class="campo-obrigatorio" aria-hidden="true">*</span>
                                             <select class="management-select" name="forma_pagamento" aria-label="Forma de pagamento">
                                                 <?php foreach (FORMAS_PAGAMENTO as $valorForma => $rotuloForma): ?>
@@ -266,7 +266,7 @@ $rotulosPagamento = ['pendente' => 'Pendente', 'confirmado' => 'Confirmado', 'es
             </div>
             <div class="management-field">
                 <label for="valor-lancamento">Valor total (R$) <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                <input class="management-input" id="valor-lancamento" name="valor" inputmode="decimal" required placeholder="1250,00">
+                <input class="management-input" id="valor-lancamento" name="valor" maxlength="16" inputmode="decimal" required placeholder="1250,00">
             </div>
             <div class="management-field">
                 <label for="data-lancamento">Data <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
@@ -302,7 +302,7 @@ $rotulosPagamento = ['pendente' => 'Pendente', 'confirmado' => 'Confirmado', 'es
                         </div>
                         <label class="management-field management-rateio__valor">
                             <span class="management-muted">R$</span>
-                            <input class="management-input" name="rateios[<?= (int) $evento['id'] ?>]" inputmode="decimal" aria-label="Valor rateado para <?= h($evento['titulo']) ?>" placeholder="0,00">
+                            <input class="management-input" name="rateios[<?= (int) $evento['id'] ?>]" maxlength="16" inputmode="decimal" aria-label="Valor rateado para <?= h($evento['titulo']) ?>" placeholder="0,00">
                         </label>
                     </div>
                 <?php endforeach; ?>

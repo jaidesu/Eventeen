@@ -3,7 +3,8 @@ declare(strict_types=1);
 require __DIR__ . '/config.php';
 require __DIR__ . '/includes/autenticacao.php';
 
-$token = (string) ($_POST['token'] ?? $_GET['token'] ?? '');
+$tokenRecebido = $_POST['token'] ?? $_GET['token'] ?? '';
+$token = is_string($tokenRecebido) ? substr($tokenRecebido, 0, 64) : '';
 $erro = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     validateCsrfToken();
@@ -59,16 +60,16 @@ $usuarioDoLink = usuarioDoTokenRedefinicao($pdo, $token);
                 <form class="auth-form" action="redefinir-senha.php" method="post">
                     <input type="hidden" name="csrf_token" value="<?= h(csrfToken()) ?>">
                     <input type="hidden" name="token" value="<?= h($token) ?>">
-                    <input type="text" name="username" value="<?= h($usuarioDoLink['email']) ?>" autocomplete="username" hidden>
+                    <input type="text" name="username" maxlength="190" value="<?= h($usuarioDoLink['email']) ?>" autocomplete="username" hidden>
                     <?php renderRequiredFieldsNote(); ?>
                     <div class="campo">
                         <label for="nova-senha">Nova senha <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                        <input type="password" id="nova-senha" name="nova_senha" autocomplete="new-password" minlength="<?= SENHA_TAMANHO_MINIMO ?>" aria-describedby="senha-ajuda" required>
-                        <small id="senha-ajuda" class="ajuda">Use pelo menos <?= SENHA_TAMANHO_MINIMO ?> caracteres.</small>
+                        <input type="password" id="nova-senha" name="nova_senha" autocomplete="new-password" <?= atributosSenhaNova() ?> aria-describedby="senha-ajuda" required>
+                        <small id="senha-ajuda" class="ajuda">Use de <?= SENHA_TAMANHO_MINIMO ?> a <?= SENHA_TAMANHO_MAXIMO ?> caracteres.</small>
                     </div>
                     <div class="campo">
                         <label for="confirmar-senha">Confirmar nova senha <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                        <input type="password" id="confirmar-senha" name="confirmar_senha" autocomplete="new-password" minlength="<?= SENHA_TAMANHO_MINIMO ?>" required>
+                        <input type="password" id="confirmar-senha" name="confirmar_senha" autocomplete="new-password" <?= atributosSenhaNova() ?> required>
                     </div>
                     <button type="submit" class="botao">Salvar nova senha</button>
                 </form>

@@ -68,8 +68,7 @@ $statusFiltro = is_string($statusRecebido) ? $statusRecebido : '';
 if (!in_array($statusFiltro, ['', 'rascunho', 'publicado', 'cancelado', 'encerrado'], true)) {
     $statusFiltro = '';
 }
-$termoRecebido = $_GET['q'] ?? '';
-$termo = is_string($termoRecebido) ? trim($termoRecebido) : '';
+$termo = termoDeBusca($_GET['q'] ?? '');
 $sql = "SELECT e.*,
             (SELECT COUNT(*) FROM inscricoes i
              WHERE i.evento_id = e.id AND i.status = 'ativa') AS inscritos,
@@ -116,7 +115,7 @@ renderManagementStart(
 ?>
 <div class="management-toolbar">
     <form class="management-actions management-event-filters" method="get" action="eventos.php">
-        <input class="management-search" type="search" name="q" value="<?= h($termo) ?>" placeholder="Buscar por nome ou local" aria-label="Buscar eventos">
+        <input class="management-search" type="search" name="q" maxlength="<?= BUSCA_TAMANHO_MAXIMO ?>" value="<?= h($termo) ?>" placeholder="Buscar por nome ou local" aria-label="Buscar eventos">
         <select class="management-select" name="status" aria-label="Filtrar por status">
             <option value="">Todos os status</option>
             <?php foreach (['rascunho' => 'Rascunho', 'publicado' => 'Publicado', 'cancelado' => 'Cancelado', 'encerrado' => 'Encerrado'] as $valor => $rotulo): ?>

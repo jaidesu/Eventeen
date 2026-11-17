@@ -4,8 +4,7 @@ require_once __DIR__ . '/../includes/gestao.php';
 require_once __DIR__ . '/../includes/usuarios.php';
 
 $usuario = requireRole('administrador');
-$termoRecebido = $_GET['q'] ?? '';
-$termo = is_string($termoRecebido) ? trim($termoRecebido) : '';
+$termo = termoDeBusca($_GET['q'] ?? '');
 $perfilRecebido = $_GET['perfil'] ?? '';
 $perfilFiltro = is_string($perfilRecebido) && isset(PERFIS_USUARIO[$perfilRecebido]) ? $perfilRecebido : '';
 
@@ -25,7 +24,7 @@ renderManagementStart($usuario, 'Administração de usuários', 'Consulte os usu
     <p class="management-notice" role="status"><?= h($mensagem) ?></p>
 <?php endif; ?>
 <form class="management-toolbar" method="get" action="usuarios.php">
-    <input class="management-search" type="search" name="q" value="<?= h($termo) ?>" placeholder="Buscar por nome, e-mail ou matrícula" aria-label="Buscar usuários">
+    <input class="management-search" type="search" name="q" maxlength="<?= BUSCA_TAMANHO_MAXIMO ?>" value="<?= h($termo) ?>" placeholder="Buscar por nome, e-mail ou matrícula" aria-label="Buscar usuários">
     <div class="management-actions">
         <select class="management-select" name="perfil" aria-label="Filtrar por perfil">
             <option value="">Todos os perfis</option>

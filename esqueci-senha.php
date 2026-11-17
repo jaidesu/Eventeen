@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     validateCsrfToken();
     $emailInformado = trim((string) ($_POST['email'] ?? ''));
     $email = filter_var(normalizarEmailAcesso($emailInformado), FILTER_VALIDATE_EMAIL);
-    if (!$email) {
+    if (!$email || mb_strlen($email, 'UTF-8') > 190) {
         $erro = 'Informe um e-mail válido.';
     } else {
         try {
@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php renderRequiredFieldsNote(); ?>
                     <div class="campo">
                         <label for="email">E-mail <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                        <input type="email" id="email" name="email" autocomplete="email" placeholder="seuemail@exemplo.com" value="<?= h($emailInformado) ?>" required>
+                        <input type="email" id="email" name="email" maxlength="190" autocomplete="email" placeholder="seuemail@exemplo.com" value="<?= h($emailInformado) ?>" required>
                     </div>
                     <button type="submit" class="botao">Enviar link</button>
                 </form>
