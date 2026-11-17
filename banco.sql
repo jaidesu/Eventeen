@@ -1,11 +1,5 @@
 SET NAMES utf8mb4;
 
-CREATE DATABASE IF NOT EXISTS eventeen
-    CHARACTER SET utf8mb4
-    COLLATE utf8mb4_unicode_ci;
-
-USE eventeen;
-
 CREATE TABLE IF NOT EXISTS usuarios (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     nome VARCHAR(150) NOT NULL,
