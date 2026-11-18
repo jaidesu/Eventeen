@@ -486,9 +486,14 @@ WHERE e.titulo = 'Mostra de Projetos Acadêmicos'
       WHERE pa.atividade_id = a.id AND pa.usuario_id = u.id
   );
 
+-- Os códigos de validação têm 16 dígitos hexadecimais; corrige os de demonstração
+-- de importações antigas, que usavam letras fora desse formato e não eram validados.
+UPDATE certificados SET codigo_validacao = 'E2026DE000000001' WHERE codigo_validacao = 'EVT2026DEMO00001';
+UPDATE certificados SET codigo_validacao = 'E2026DE000000002' WHERE codigo_validacao = 'EVT2026DEMO00002';
+
 INSERT INTO certificados (atividade_id, usuario_id, evento_id, codigo_validacao, carga_horaria)
 SELECT a.id, u.id, a.evento_id,
-       IF(a.titulo = 'Abertura e apresentação dos projetos', 'EVT2026DEMO00001', 'EVT2026DEMO00002'),
+       IF(a.titulo = 'Abertura e apresentação dos projetos', 'E2026DE000000001', 'E2026DE000000002'),
        IF(a.titulo = 'Abertura e apresentação dos projetos', 1.00, 2.00)
 FROM atividades a
 JOIN eventos e ON e.id = a.evento_id

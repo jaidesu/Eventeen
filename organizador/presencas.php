@@ -3,6 +3,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/gestao.php';
 require_once __DIR__ . '/../includes/programacao.php';
 require_once __DIR__ . '/../includes/presencas.php';
+require_once __DIR__ . '/../includes/certificados.php';
 
 $usuario = requireRole('organizador');
 $organizadorId = (int) $usuario['id'];
@@ -112,13 +113,16 @@ if ($eventoId !== null) {
 
     if ($atividadeSelecionada !== null) {
         $consulta = $pdo->prepare(
-            'SELECT i.usuario_id, u.nome, u.email, pa.confirmado_em
+            'SELECT i.usuario_id, u.nome, u.email, pa.confirmado_em, c.codigo_validacao
              FROM inscricoes i
              JOIN usuarios u ON u.id = i.usuario_id
              LEFT JOIN presencas_atividades pa
                ON pa.atividade_id = :atividade_id
               AND pa.evento_id = i.evento_id
               AND pa.usuario_id = i.usuario_id
+             LEFT JOIN certificados c
+               ON c.atividade_id = pa.atividade_id
+              AND c.usuario_id = pa.usuario_id
              WHERE i.evento_id = :evento_id AND i.status = \'ativa\'
              ORDER BY u.nome, u.id'
         );
@@ -128,6 +132,11 @@ if ($eventoId !== null) {
 }
 
 $resultado = $_GET['resultado'] ?? '';
+if ($mensagem === null && isset($_SESSION['aviso_presencas'])) {
+    $mensagem = (string) $_SESSION['aviso_presencas'];
+    $erro = true;
+}
+unset($_SESSION['aviso_presencas']);
 if ($mensagem === null && $resultado === 'registrar') {
     $mensagem = 'Presença da atividade confirmada.';
 } elseif ($mensagem === null && $resultado === 'remover') {
@@ -140,7 +149,7 @@ if ($mensagem === null && $resultado === 'registrar') {
 renderManagementStart(
     $usuario,
     'Inscrições e presenças',
-    'Registre a presença de participantes inscritos em cada atividade do evento.',
+    'Registre a presença de participantes inscritos em cada atividade e baixe os certificados das atividades concluídas.',
     'presencas',
     false
 );
@@ -207,6 +216,7 @@ renderManagementStart(
             $totalPresencas = count(array_filter($participantes, static fn (array $item): bool => $item['confirmado_em'] !== null));
             $pendentes = $totalInscritos - $totalPresencas;
             $taxaPresenca = $totalInscritos > 0 ? (int) round($totalPresencas * 100 / $totalInscritos) . '%' : '0%';
+            $atividadeConcluida = strtotime((string) $atividadeSelecionada['fim']) <= time();
             ?>
             <section class="management-kpis" aria-label="Resumo da atividade">
                 <?php managementKpi((string) $totalInscritos, 'Inscrições Confirmadas', '♙'); ?>
@@ -253,6 +263,7 @@ renderManagementStart(
                                     <?php endif; ?>
                                 </td>
                                 <td data-label="Ação">
+                                    <div class="management-actions">
                                     <form method="post" action="presencas.php"<?= $participante['confirmado_em'] !== null ? ' data-confirmar="Remover a presença deste participante na atividade?"' : '' ?>>
                                         <input type="hidden" name="csrf_token" value="<?= h(csrfToken()) ?>">
                                         <input type="hidden" name="evento_id" value="<?= $eventoId ?>">
@@ -266,6 +277,18 @@ renderManagementStart(
                                             <button class="management-button management-button--secondary" type="submit">Remover presença</button>
                                         <?php endif; ?>
                                     </form>
+                                    <?php if ($participante['confirmado_em'] !== null && $participante['codigo_validacao'] !== null): ?>
+                                        <a class="management-button management-button--secondary" href="certificado.php?codigo=<?= h(rawurlencode((string) $participante['codigo_validacao'])) ?>" target="_blank" rel="noopener">Ver certificado</a>
+                                    <?php elseif ($participante['confirmado_em'] !== null && $atividadeConcluida): ?>
+                                        <form method="post" action="certificado.php" target="_blank" data-confirmar="Emitir o certificado deste participante? Depois de emitido, a presença não poderá mais ser removida.">
+                                            <input type="hidden" name="csrf_token" value="<?= h(csrfToken()) ?>">
+                                            <input type="hidden" name="evento_id" value="<?= $eventoId ?>">
+                                            <input type="hidden" name="atividade_id" value="<?= (int) $atividadeSelecionada['id'] ?>">
+                                            <input type="hidden" name="participante_id" value="<?= (int) $participante['usuario_id'] ?>">
+                                            <button class="management-button management-button--secondary" type="submit">Emitir certificado</button>
+                                        </form>
+                                    <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>

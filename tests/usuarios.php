@@ -92,6 +92,14 @@ try {
         static fn () => atualizarUsuarioAdministracao($pdo, $usuarios['organizador'], 'Usuário organizador', "usuarios-organizador-{$nonce}@example.invalid", '', 'participante'),
         'único responsável'
     );
+    // Administradores também gerenciam eventos: o organizador único pode ser promovido...
+    atualizarUsuarioAdministracao($pdo, $usuarios['organizador'], 'Usuário organizador', "usuarios-organizador-{$nonce}@example.invalid", '', 'administrador');
+    $assert(buscarUsuario($pdo, $usuarios['organizador'])['perfil'] === 'administrador', 'O organizador único deveria poder virar administrador.');
+    // ...mas continua sem poder ser rebaixado a participante enquanto for o único responsável.
+    $esperarRejeicao(
+        static fn () => atualizarUsuarioAdministracao($pdo, $usuarios['organizador'], 'Usuário organizador', "usuarios-organizador-{$nonce}@example.invalid", '', 'participante'),
+        'único responsável'
+    );
 
     $totais = contarUsuariosPorPerfil($pdo);
     $assert($totais['total'] >= 4, 'A contagem de usuários por perfil está incorreta.');

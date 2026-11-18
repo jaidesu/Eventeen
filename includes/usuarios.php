@@ -65,7 +65,7 @@ function buscarUsuario(PDO $pdo, int $usuarioId): ?array
 /**
  * Atualiza dados e perfil de um usuário (RF03).
  * Regras: e-mail e matrícula únicos; o último administrador não pode ser rebaixado;
- * um organizador que seja o único responsável por algum evento não perde o perfil.
+ * o único responsável por um evento ativo pode virar administrador, mas não participante.
  */
 function atualizarUsuarioAdministracao(
     PDO $pdo,
@@ -108,7 +108,10 @@ function atualizarUsuarioAdministracao(
             throw new DomainException('Não é possível revogar o último administrador do sistema.');
         }
 
-        if ($atual['perfil'] === 'organizador' && $perfil !== 'organizador') {
+        // Administradores também gerenciam eventos, então promover o organizador
+        // único a administrador é permitido; só o rebaixamento a participante
+        // deixaria o evento sem responsável.
+        if ($atual['perfil'] !== 'participante' && $perfil === 'participante') {
             $consulta = $pdo->prepare(
                 "SELECT e.titulo
                  FROM evento_organizadores eo
@@ -122,7 +125,7 @@ function atualizarUsuarioAdministracao(
             $eventoUnico = $consulta->fetchColumn();
             if ($eventoUnico !== false) {
                 throw new DomainException(
-                    'Este organizador é o único responsável pelo evento "' . $eventoUnico
+                    'Este usuário é o único responsável pelo evento "' . $eventoUnico
                     . '". Inclua outro organizador no evento antes de revogar o acesso.'
                 );
             }

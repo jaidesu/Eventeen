@@ -1122,6 +1122,12 @@ body.app-body {
         background: transparent;
     }
 
+    /* Avisos soltos no conteúdo (ex.: "Validar certificado") ocupam a linha toda do grid. */
+    .app-content > .app-empty {
+        grid-column: 1 / -1;
+        margin: 0;
+    }
+
     .app-header {
         grid-column: 1 / -1;
         margin: 0;
@@ -1544,6 +1550,17 @@ select:focus-visible {
         grid-column: 1 / -1;
         margin-top: -8px;
     }
+}
+
+/* Aviso logo abaixo dos botões de inscrição: sem a margem negativa das listagens. */
+.app-action-group + .app-results-count {
+    margin-top: 12px;
+    line-height: 1.5;
+}
+
+/* Programação separada dos botões e do aviso nos detalhes do evento. */
+.app-surface > .app-section {
+    margin-top: 28px;
 }
 
 .app-event-card__cta + .app-event-card__cta {

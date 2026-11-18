@@ -167,6 +167,21 @@ if ($eventoId !== null) {
     $mensagem = 'Cadastre um evento e vincule seu usuário como organizador para criar a programação.';
 }
 
+// Nova atividade: sugere o início do evento (e uma hora de duração, sem passar
+// do encerramento) para o organizador só ajustar o horário.
+$inicioEventoCampo = '';
+$fimEventoCampo = '';
+if ($eventoAtual !== null) {
+    $inicioEventoCampo = str_replace(' ', 'T', substr((string) $eventoAtual['data_inicio'], 0, 16));
+    $fimEventoCampo = str_replace(' ', 'T', substr((string) $eventoAtual['data_fim'], 0, 16));
+    if ($editarId === null && $form['inicio'] === '' && $form['fim'] === '') {
+        $form['inicio'] = $inicioEventoCampo;
+        $fimSugerido = date('Y-m-d\TH:i', strtotime((string) $eventoAtual['data_inicio'] . ' +1 hour'));
+        $form['fim'] = $fimSugerido < $fimEventoCampo ? $fimSugerido : $fimEventoCampo;
+    }
+}
+$capacidadeEvento = $eventoAtual !== null && $eventoAtual['capacidade'] !== null ? (int) $eventoAtual['capacidade'] : null;
+
 $resultado = $_GET['resultado'] ?? '';
 if ($mensagem === null && $resultado === 'salvo') {
     $mensagem = 'Atividade salva na programação.';
@@ -212,21 +227,22 @@ renderManagementStart($usuario, 'Atividades e programação', 'Monte a agenda do
                         <select class="management-select" id="espaco-atividade" name="espaco_id" required>
                             <option value="">Selecione</option>
                             <?php foreach ($espacos as $espaco): ?>
-                                <option value="<?= (int) $espaco['id'] ?>"<?= (string) $espaco['id'] === $form['espaco_id'] ? ' selected' : '' ?>><?= h($espaco['nome']) ?> · <?= (int) $espaco['capacidade'] ?> pessoas</option>
+                                <option value="<?= (int) $espaco['id'] ?>" data-capacidade="<?= $capacidadeEvento !== null ? min((int) $espaco['capacidade'], $capacidadeEvento) : (int) $espaco['capacidade'] ?>"<?= (string) $espaco['id'] === $form['espaco_id'] ? ' selected' : '' ?>><?= h($espaco['nome']) ?> · <?= (int) $espaco['capacidade'] ?> pessoas</option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div class="management-field">
                         <label for="inicio-atividade">Início <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                        <input class="management-input" id="inicio-atividade" name="inicio" type="datetime-local" required value="<?= h($form['inicio']) ?>">
+                        <input class="management-input" id="inicio-atividade" name="inicio" type="datetime-local" required min="<?= h($inicioEventoCampo) ?>" max="<?= h($fimEventoCampo) ?>" value="<?= h($form['inicio']) ?>">
                     </div>
                     <div class="management-field">
                         <label for="fim-atividade">Fim <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-                        <input class="management-input" id="fim-atividade" name="fim" type="datetime-local" required value="<?= h($form['fim']) ?>">
+                        <input class="management-input" id="fim-atividade" name="fim" type="datetime-local" required min="<?= h($inicioEventoCampo) ?>" max="<?= h($fimEventoCampo) ?>" value="<?= h($form['fim']) ?>">
                     </div>
                     <div class="management-field">
                         <label for="capacidade-atividade">Capacidade (pessoas) <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
                         <input class="management-input" id="capacidade-atividade" name="capacidade" type="number" min="1" max="4294967295" required value="<?= h($form['capacidade']) ?>">
+                        <small class="management-muted">Preenchida com as vagas do espaço selecionado<?= $capacidadeEvento !== null ? ' (limitada à capacidade do evento)' : '' ?>; pode ser reduzida.</small>
                     </div>
                     <div class="management-field">
                         <label for="palestrantes-atividade">Palestrantes <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
@@ -279,4 +295,52 @@ renderManagementStart($usuario, 'Atividades e programação', 'Monte a agenda do
         </section>
     <?php endif; ?>
 <?php endif; ?>
+<script>
+    (function () {
+        var espaco = document.getElementById('espaco-atividade');
+        var capacidade = document.getElementById('capacidade-atividade');
+        var inicio = document.getElementById('inicio-atividade');
+        var fim = document.getElementById('fim-atividade');
+        if (!espaco || !capacidade || !inicio || !fim) {
+            return;
+        }
+        // A capacidade da atividade acompanha as vagas do espaço escolhido.
+        function vagasDoEspaco() {
+            var opcao = espaco.options[espaco.selectedIndex];
+            return opcao && opcao.dataset.capacidade ? opcao.dataset.capacidade : '';
+        }
+        function aplicarCapacidade(substituir) {
+            var vagas = vagasDoEspaco();
+            if (vagas === '') {
+                capacidade.removeAttribute('max');
+                return;
+            }
+            capacidade.max = vagas;
+            if (substituir || capacidade.value === '' || Number(capacidade.value) > Number(vagas)) {
+                capacidade.value = vagas;
+            }
+        }
+        espaco.addEventListener('change', function () { aplicarCapacidade(true); });
+        aplicarCapacidade(false);
+
+        // O fim não pode ser anterior ao início: o calendário começa no início escolhido.
+        function atualizarFim() {
+            if (!inicio.value) {
+                return;
+            }
+            fim.min = inicio.value;
+            if (!fim.value || fim.value <= inicio.value) {
+                // Sugere uma hora de duração, sem passar do encerramento do evento.
+                var data = new Date(inicio.value);
+                data.setHours(data.getHours() + 1);
+                var doisDigitos = function (n) { return String(n).padStart(2, '0'); };
+                var sugestao = data.getFullYear() + '-' + doisDigitos(data.getMonth() + 1) + '-' + doisDigitos(data.getDate())
+                    + 'T' + doisDigitos(data.getHours()) + ':' + doisDigitos(data.getMinutes());
+                fim.value = fim.max && sugestao > fim.max ? fim.max : sugestao;
+            }
+        }
+        inicio.addEventListener('change', atualizarFim);
+        atualizarFim();
+    })();
+</script>
 <?php renderManagementEnd($usuario); ?>

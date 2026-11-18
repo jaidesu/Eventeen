@@ -38,7 +38,10 @@ if ($eventoId !== null) {
     $organizadoresSelecionados = array_map('intval', $consulta->fetchAll(PDO::FETCH_COLUMN));
 }
 
-$consulta = $pdo->query("SELECT id, nome, email FROM usuarios WHERE perfil = 'organizador' ORDER BY nome");
+// Administradores também gerenciam eventos e podem continuar responsáveis por eles.
+$consulta = $pdo->query(
+    "SELECT id, nome, email, perfil FROM usuarios WHERE perfil IN ('organizador', 'administrador') ORDER BY nome"
+);
 $organizadoresDisponiveis = $consulta->fetchAll();
 $mensagem = null;
 $erro = false;
@@ -105,6 +108,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $dataInicio = $dataInicioObj->format('Y-m-d H:i:s');
             $dataFim = $dataFimObj->format('Y-m-d H:i:s');
+            // Não se agenda evento no passado. Na edição, um evento que já começou
+            // pode manter o início original, mas não ser remarcado para o passado.
+            $agora = new DateTimeImmutable('now');
+            $inicioAlterado = $evento === null || substr((string) $evento['data_inicio'], 0, 16) !== $dataInicioObj->format('Y-m-d H:i');
+            $fimAlterado = $evento === null || substr((string) $evento['data_fim'], 0, 16) !== $dataFimObj->format('Y-m-d H:i');
+            if ($inicioAlterado && $dataInicioObj < $agora) {
+                $mensagem = 'O início do evento não pode ser uma data ou horário que já passou.';
+                $erro = true;
+            } elseif ($fimAlterado && $dataFimObj < $agora) {
+                $mensagem = 'O encerramento do evento não pode ser uma data ou horário que já passou.';
+                $erro = true;
+            }
         }
     }
 
@@ -119,7 +134,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         || $capacidade === false
         || $capacidade < 1
         || $capacidade > 4294967295
-        || !in_array($texto['status'], ['rascunho', 'publicado'], true)
+        // Eventos cancelados ou encerrados mantêm o status atual ao serem editados.
+        || (!in_array($texto['status'], ['rascunho', 'publicado'], true)
+            && !($evento !== null && $texto['status'] === $evento['status']))
     )) {
         $mensagem = 'Preencha título, local e capacidade positiva. Verifique também os limites dos campos.';
         $erro = true;
@@ -160,11 +177,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $marcadores = implode(',', array_fill(0, count($idsOrganizadores), '?'));
             $consulta = $pdo->prepare(
-                "SELECT id FROM usuarios WHERE perfil = 'organizador' AND id IN ({$marcadores})"
+                "SELECT id FROM usuarios WHERE perfil IN ('organizador', 'administrador') AND id IN ({$marcadores})"
             );
             $consulta->execute($idsOrganizadores);
             if (count($consulta->fetchAll(PDO::FETCH_COLUMN)) !== count($idsOrganizadores)) {
-                throw new DomainException('Selecione somente usuários que tenham perfil de organizador.');
+                throw new DomainException('Selecione somente usuários com perfil de organizador ou administrador.');
             }
 
             if ($eventoId !== null) {
@@ -281,6 +298,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// Menor data aceita nos campos de data: agora; na edição, um evento que já
+// começou (ou terminou) mantém a data original como limite.
+$minimoAgora = date('Y-m-d\TH:i');
+$inicioOriginalCampo = isset($evento['data_inicio']) ? str_replace(' ', 'T', substr((string) $evento['data_inicio'], 0, 16)) : null;
+$fimOriginalCampo = isset($evento['data_fim']) ? str_replace(' ', 'T', substr((string) $evento['data_fim'], 0, 16)) : null;
+$minimoInicio = $inicioOriginalCampo !== null && $inicioOriginalCampo < $minimoAgora ? $inicioOriginalCampo : $minimoAgora;
+$minimoFim = $fimOriginalCampo !== null && $fimOriginalCampo < $minimoAgora ? $fimOriginalCampo : $minimoAgora;
+
 $inscritos = 0;
 if ($eventoId !== null) {
     $consulta = $pdo->prepare(
@@ -326,11 +351,11 @@ renderManagementStart(
         </div>
         <div class="management-field">
             <label for="inicio-evento">Início <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-            <input id="inicio-evento" name="inicio" class="management-input" type="datetime-local" required value="<?= h($valores['inicio']) ?>">
+            <input id="inicio-evento" name="inicio" class="management-input" type="datetime-local" required min="<?= h($minimoInicio) ?>" value="<?= h($valores['inicio']) ?>">
         </div>
         <div class="management-field">
             <label for="fim-evento">Encerramento <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
-            <input id="fim-evento" name="fim" class="management-input" type="datetime-local" required value="<?= h($valores['fim']) ?>">
+            <input id="fim-evento" name="fim" class="management-input" type="datetime-local" required min="<?= h($minimoFim) ?>" data-minimo="<?= h($minimoFim) ?>" value="<?= h($valores['fim']) ?>">
         </div>
         <div class="management-field">
             <label for="vagas-evento">Limite de participantes <span class="campo-obrigatorio" aria-hidden="true">*</span></label>
@@ -373,4 +398,20 @@ renderManagementStart(
         <a class="management-button management-button--secondary" href="eventos.php">Voltar</a>
     </div>
 </form>
+<script>
+    // O encerramento não pode ser anterior ao início: o calendário passa a começar no início escolhido.
+    (function () {
+        var inicio = document.getElementById('inicio-evento');
+        var fim = document.getElementById('fim-evento');
+        function atualizarMinimoFim() {
+            var minimo = fim.dataset.minimo;
+            if (inicio.value && inicio.value > minimo) {
+                minimo = inicio.value;
+            }
+            fim.min = minimo;
+        }
+        inicio.addEventListener('change', atualizarMinimoFim);
+        atualizarMinimoFim();
+    })();
+</script>
 <?php renderManagementEnd($usuario); ?>

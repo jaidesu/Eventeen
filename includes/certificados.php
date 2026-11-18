@@ -73,6 +73,39 @@ function emitirCertificadoAtividade(PDO $pdo, int $usuarioId, int $atividadeId):
     }
 }
 
+/**
+ * Organizadores (e administradores) só acessam certificados dos eventos que gerenciam.
+ */
+function organizadorGerenciaEvento(PDO $pdo, int $organizadorId, int $eventoId): bool
+{
+    $consulta = $pdo->prepare(
+        'SELECT 1 FROM eventos e WHERE e.id = :evento_id AND ' . organizadorEscopoEventoSql('e.id')
+    );
+    $consulta->execute(['evento_id' => $eventoId, 'usuario_id' => $organizadorId]);
+
+    return $consulta->fetchColumn() !== false;
+}
+
+/**
+ * Emite (ou reapresenta) o certificado de um participante a pedido da organização do evento,
+ * com as mesmas exigências da emissão pelo participante: presença confirmada e atividade concluída.
+ */
+function emitirCertificadoPeloOrganizador(
+    PDO $pdo,
+    int $organizadorId,
+    int $eventoId,
+    int $atividadeId,
+    int $participanteId
+): string {
+    $consulta = $pdo->prepare('SELECT 1 FROM atividades WHERE id = :atividade_id AND evento_id = :evento_id');
+    $consulta->execute(['atividade_id' => $atividadeId, 'evento_id' => $eventoId]);
+    if ($consulta->fetchColumn() === false || !organizadorGerenciaEvento($pdo, $organizadorId, $eventoId)) {
+        throw new DomainException('Atividade não encontrada neste evento ou você não tem permissão para acessá-la.');
+    }
+
+    return emitirCertificadoAtividade($pdo, $participanteId, $atividadeId);
+}
+
 function normalizarCodigoCertificado(string $codigo): string
 {
     return strtoupper((string) preg_replace('/[^0-9A-Fa-f]/', '', $codigo));
@@ -90,7 +123,7 @@ function buscarCertificadoPorCodigo(PDO $pdo, string $codigo): ?array
         return null;
     }
     $consulta = $pdo->prepare(
-        'SELECT c.id, c.usuario_id, c.atividade_id, c.codigo_validacao, c.carga_horaria, c.emitido_em,
+        'SELECT c.id, c.usuario_id, c.atividade_id, c.evento_id, c.codigo_validacao, c.carga_horaria, c.emitido_em,
                 u.nome AS participante_nome,
                 a.titulo AS atividade_titulo, a.tipo AS atividade_tipo, a.inicio, a.fim,
                 e.titulo AS evento_titulo, e.local AS evento_local

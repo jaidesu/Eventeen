@@ -31,6 +31,7 @@ try {
     );
     foreach ([
         'organizador' => ['Organizadora de teste', 'organizador'],
+        'outro_organizador' => ['Organizador de outro evento', 'organizador'],
         'presente' => ['Participante Presente', 'participante'],
         'ausente' => ['Participante Ausente', 'participante'],
     ] as $chave => [$nome, $perfil]) {
@@ -110,6 +111,23 @@ try {
         static fn () => registrarPresencaAtividade($pdo, $eventoId, $usuarios['organizador'], $atividadeConcluida, $usuarios['presente'], false),
         'certificado já foi emitido'
     );
+
+    // A organização do evento acessa os certificados dos participantes; outro organizador não.
+    $assert(organizadorGerenciaEvento($pdo, $usuarios['organizador'], $eventoId), 'O organizador do evento deveria acessar os certificados.');
+    $assert(!organizadorGerenciaEvento($pdo, $usuarios['outro_organizador'], $eventoId), 'Um organizador de outro evento acessou os certificados.');
+    $assert(
+        emitirCertificadoPeloOrganizador($pdo, $usuarios['organizador'], $eventoId, $atividadeConcluida, $usuarios['presente']) === $codigo,
+        'O organizador deveria reapresentar o certificado já emitido.'
+    );
+    $esperarRejeicao(
+        static fn () => emitirCertificadoPeloOrganizador($pdo, $usuarios['outro_organizador'], $eventoId, $atividadeConcluida, $usuarios['presente']),
+        'permissão'
+    );
+    $esperarRejeicao(
+        static fn () => emitirCertificadoPeloOrganizador($pdo, $usuarios['organizador'], $eventoId, $atividadeConcluida, $usuarios['ausente']),
+        'presença confirmada'
+    );
+    $assert((int) $certificado['evento_id'] === $eventoId, 'A busca pelo código deveria informar o evento do certificado.');
 
     $historico = historicoAtividadesParticipante($pdo, $usuarios['presente']);
     $assert(count($historico) === 1 && $historico[0]['codigo_validacao'] === $codigo, 'O histórico não exibiu o certificado emitido.');
