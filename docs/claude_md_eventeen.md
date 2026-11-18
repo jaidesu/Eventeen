@@ -162,6 +162,7 @@ Fonte completa: Estudo de Caso BD, seções 2.2 a 2.5. **Versão V1 — pendente
 | I-07 | Cardinalidades refinadas e vínculos adicionados (id\_evento em ATIVIDADES e PRESENCA; PGTO→CONTAS) aguardam validação | Estudo §2.2 | Aberto |
 | I-08 | Documento de Visão datado de 13/08/2026, mas o registro de configuração começa em 14/08 | Visão §1 × tabela de configuração | Baixa relevância — confirmar |
 | I-09 | Estudo de Caso menciona "Engenharia de Software II/III" | Estudo, cabeçalho | Confirmar a disciplina correta |
+| I-10 | Titularidade do sistema: desenvolvido como trabalho de disciplina; a Lei 9.609/1998, art. 4º, estende a regra do empregador/órgão público a "bolsistas, estagiários e assemelhados" | Documentação §2.7 | Aberto — confirmar com a coordenação e a política de propriedade intelectual do Centro Paula Souza antes de oferecer o serviço |
 
 Ao resolver um item: mover a decisão para a seção 11 e marcar aqui como "Resolvido em AAAA-MM-DD (D-XX)".
 
@@ -280,6 +281,7 @@ Não escolher stack por conta própria: sugerir opções apenas quando pedido e 
 | D-09 | 2026-11-12 | Preparação para publicação: recuperação de senha e confirmação de inscrição por e-mail (SMTP, mail() ou arquivo), limite de tentativas de login, expiração de sessão por inatividade, troca de senha encerra outras sessões, configuração do servidor em config.local.php e erros ocultos em produção | Avaliação de prontidão para uso público | RF02, RNF02, RNF04, seções 1.7, 11 e 12 |
 | D-10 | 2026-11-13 | Cadastro em abas com código de acesso para organizadores (valor em `codigo_organizador`, trocável em config.local.php); asterisco em campos obrigatórios com aviso em cada formulário; fuso horário configurável (padrão America/Sao_Paulo) com o banco ajustado ao mesmo fuso | Mudanças da equipe integradas após merge com defeitos | RN15, RF01, CA-RF01, UC01, seções 11 e 12 |
 | D-11 | 2026-11-17 | Limite de tamanho em todas as entradas: maxlength igual à coluna do banco nas telas e a mesma validação no servidor; senha nova de 8 a 64 caracteres (bcrypt usa até 72 bytes); busca até 100 caracteres; requisição até 1 MB, campo até 64 KB e no máximo 900 valores | Apontamento de segurança sobre campos sem limite no cadastro | RNF04, CA-RNF04, seções 11 e 12.3 |
+| D-12 | 2026-11-18 | Modelo de negócio: mensalidade por instalação (licença, hospedagem e suporte pela equipe); taxa de 10% sobre inscrições pagas arquivada até haver pagamento integrado; Fatec como usuária licenciada, sem transferência de propriedade; dados pertencem à instituição (proposta — validar com a equipe; valores [A DEFINIR PELA EQUIPE]) | Pedido do usuário | Seções 2.7, 12.3 e 14.6; README |
 |  |  |  |  |  |
 
 ---
@@ -315,4 +317,5 @@ Não escolher stack por conta própria: sugerir opções apenas quando pedido e 
 | 2026-11-12 | Decisão D-09 registrada (segurança e publicação); suíte com 9 arquivos e 174 verificações |
 | 2026-11-13 | Correção do merge e decisão D-10 registrada; suíte com 9 arquivos e 179 verificações |
 | 2026-11-17 | Decisão D-11 registrada (limites de entrada); suíte com 9 arquivos e 187 verificações |
+| 2026-11-18 | Decisão D-12 (modelo de negócio e licenciamento) e inconsistência I-10 (titularidade) registradas |
 

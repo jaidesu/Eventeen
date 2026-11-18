@@ -140,3 +140,11 @@ Sem configuração, os e-mails (recuperação de senha e confirmação de inscri
 Sem `config.local.php`, o sistema só se considera em desenvolvimento quando acessado da própria máquina (`localhost`); qualquer acesso externo é tratado como produção e não exibe erros técnicos.
 
 Antes de abrir ao público, também são necessários os documentos exigidos pela LGPD (política de privacidade e termos de uso) e um canal para o titular pedir a exclusão dos dados.
+
+## Modelo de negócio e licença
+
+O Eventeen é oferecido como serviço: a equipe Eventeen implanta, hospeda, mantém e dá suporte ao sistema, e a instituição paga uma mensalidade pela licença de uso e pelo suporte. A taxa de 10% sobre inscrições pagas está arquivada até a plataforma receber os pagamentos por um intermediador (hoje o sistema apenas registra pagamentos informados pelo organizador).
+
+O código-fonte, a marca e a documentação pertencem à equipe Eventeen. A Fatec, caso adote o sistema, é apenas usuária licenciada: a propriedade não é transferida e o sistema não pode ser copiado, modificado, redistribuído ou instalado em outros servidores sem autorização por escrito da equipe. A publicação deste repositório não concede licença de uso: todos os direitos são reservados. Os dados cadastrados pela instituição pertencem a ela e são entregues em caso de encerramento do contrato.
+
+Detalhes, pontos em aberto e condições de contratação estão na seção 2.7 da documentação do desenvolvimento.
