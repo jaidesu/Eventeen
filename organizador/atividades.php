@@ -99,8 +99,7 @@ if ($eventoId !== null) {
         }
     }
     if ($eventoAtual === null) {
-        http_response_code(404);
-        exit('Evento não encontrado ou você não tem permissão para acessá-lo.');
+        encerrarComErro(404, 'Evento não encontrado ou você não tem permissão para acessá-lo.');
     }
 
     try {
@@ -145,8 +144,7 @@ if ($eventoId !== null) {
         $consulta->execute(['id' => $editarId, 'evento_id' => $eventoId]);
         $atividade = $consulta->fetch();
         if (!$atividade) {
-            http_response_code(404);
-            exit('Atividade não encontrada neste evento.');
+            encerrarComErro(404, 'Atividade não encontrada neste evento.');
         }
         $form = [
             'titulo' => (string) $atividade['titulo'],

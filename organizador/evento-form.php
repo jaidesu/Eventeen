@@ -30,8 +30,7 @@ if ($eventoId !== null) {
     $consulta->execute(['evento_id' => $eventoId, 'usuario_id' => (int) $usuario['id']]);
     $evento = $consulta->fetch();
     if (!$evento) {
-        http_response_code(404);
-        exit('Evento não encontrado.');
+        encerrarComErro(404, 'Evento não encontrado.');
     }
     $consulta = $pdo->prepare('SELECT usuario_id FROM evento_organizadores WHERE evento_id = :evento_id');
     $consulta->execute(['evento_id' => $eventoId]);

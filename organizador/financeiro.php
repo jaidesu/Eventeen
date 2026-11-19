@@ -100,8 +100,7 @@ foreach ($eventos as $evento) {
     }
 }
 if ($eventoId !== null && $eventoAtual === null) {
-    http_response_code(404);
-    exit('Evento não encontrado ou você não tem permissão para acessá-lo.');
+    encerrarComErro(404, 'Evento não encontrado ou você não tem permissão para acessá-lo.');
 }
 
 $resumo = [

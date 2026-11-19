@@ -65,7 +65,12 @@ A partir daí, o administrador concede ou revoga os perfis de organizador e admi
 ## Organização do código
 
 - `index.php`, `cadastro.php`, `sair.php`, `esqueci-senha.php`, `redefinir-senha.php`, `configuracoes-conta.php` e `validar-certificado.php`: acesso, recuperação de senha, sessão, conta e validação pública de certificados.
-- `config.php`: conexão, sessão e funções comuns; lê `config.local.php` quando existir (veja `config.exemplo.php`).
+- `config.php`: conexão, sessão e funções comuns.
+- `includes/base.php`: configuração (lê `config.local.php` quando existir; veja `config.exemplo.php`), endereços e escape de HTML, sem depender do banco.
+- `includes/pagina.php`: cabeçalho comum das páginas (título, SEO, ícones, PWA) e página de erro; `erro.php` exibe os erros 400, 403, 404, 405, 500, 503 e outros.
+- `manifest.json`, `sw.js`, `js/pwa.js` e `offline.html`: aplicativo instalável (PWA) e página exibida sem internet.
+- `robots.txt`, `sitemap.xml` e `.htaccess`: buscadores, páginas de erro do Apache, bloqueio de pastas internas e cache.
+- `img/`: logo, marca (cabeçalhos), imagem de compartilhamento e ícones (`img/icones/`); `favicon.ico` fica na raiz.
 - `participante/`: área do participante (início, eventos, detalhes, inscrições, cancelamento, histórico e certificado).
 - `organizador/`: painel, eventos, programação, presenças, relatórios, parceiros e financeiro.
 - `administrador/`: painel administrativo e gestão de usuários e permissões.
@@ -133,9 +138,12 @@ Sem configuração, os e-mails (recuperação de senha e confirmação de inscri
    - `fuso_horario`: fuso dos eventos (padrão `America/Sao_Paulo`); o banco é ajustado para o mesmo fuso a cada conexão;
    - `email`: servidor SMTP (porta 587 com `tls` ou 465 com `ssl`) e remetente.
 4. O `config.local.php` fica fora do Git: nunca envie senhas ao repositório. Se preferir, os dados do banco podem vir das variáveis de ambiente `EVENTEEN_DB_HOST`, `EVENTEEN_DB_NOME`, `EVENTEEN_DB_USUARIO` e `EVENTEEN_DB_SENHA`.
-5. A pasta `storage/` precisa de permissão de escrita para o PHP. No Apache, o `.htaccess` dela impede o acesso pela web; em outro servidor (como o Nginx), bloqueie a pasta na configuração ou aponte `pasta_dados` para fora da pasta publicada.
-6. Configure cópia de segurança periódica do banco.
-7. Limite o tamanho das requisições também no servidor (no Apache, `LimitRequestBody 1048576`; no Nginx, `client_max_body_size 1m`) e no PHP (`post_max_size = 1M`). Contra ataques distribuídos de negação de serviço (DDoS), use o limite de requisições ou o serviço de proteção da hospedagem (CDN ou firewall de aplicação): a aplicação sozinha não resolve esse tipo de ataque.
+5. No Apache, o `.htaccess` da raiz liga as páginas de erro (`ErrorDocument ... /erro.php`), bloqueia `includes/`, `tests/`, `docs/`, `banco.sql` e outros arquivos internos, desativa a listagem de pastas e define cache e compressão. Ele supõe o sistema na raiz do domínio (`https://eventeen.com.br/`); numa subpasta, ajuste o caminho do `ErrorDocument` (no XAMPP, `/Eventeen/erro.php`). A hospedagem precisa permitir `.htaccess` (`AllowOverride All`). No Nginx, use `error_page 403 404 500 502 503 504 /erro.php;` e bloqueie as mesmas pastas.
+6. Em `url_base`, use o endereço definitivo (`https://eventeen.com.br`): ele é o endereço canônico das páginas para os buscadores. `robots.txt` e `sitemap.xml` já apontam para esse domínio; troque-os se o domínio mudar. Depois de publicar, envie `https://eventeen.com.br/sitemap.xml` no Google Search Console.
+7. O app instalável (PWA) e o modo offline só funcionam com HTTPS. Ao mudar a lista de arquivos pré-carregados em `sw.js`, aumente a constante `VERSAO`.
+8. A pasta `storage/` precisa de permissão de escrita para o PHP. No Apache, o `.htaccess` dela impede o acesso pela web; em outro servidor (como o Nginx), bloqueie a pasta na configuração ou aponte `pasta_dados` para fora da pasta publicada.
+9. Configure cópia de segurança periódica do banco.
+10. Limite o tamanho das requisições também no servidor (no Apache, `LimitRequestBody 1048576`; no Nginx, `client_max_body_size 1m`) e no PHP (`post_max_size = 1M`). Contra ataques distribuídos de negação de serviço (DDoS), use o limite de requisições ou o serviço de proteção da hospedagem (CDN ou firewall de aplicação): a aplicação sozinha não resolve esse tipo de ataque.
 
 Sem `config.local.php`, o sistema só se considera em desenvolvimento quando acessado da própria máquina (`localhost`); qualquer acesso externo é tratado como produção e não exibe erros técnicos.
 

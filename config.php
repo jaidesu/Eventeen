@@ -1,85 +1,12 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Configuração da aplicação.
- *
- * Os valores abaixo servem para o ambiente local (XAMPP). Em um servidor,
- * copie config.exemplo.php para config.local.php (arquivo fora do Git) e
- * informe ali o banco, o endereço público e o envio de e-mails.
+/*
+ * Configuração da aplicação: os valores e as funções de base ficam em includes/base.php.
+ * Em um servidor, copie config.exemplo.php para config.local.php (fora do Git).
  */
-function appConfig(?string $chave = null): mixed
-{
-    static $config = null;
-    if ($config === null) {
-        $config = [
-            'ambiente' => null,
-            'url_base' => '',
-            'forcar_https' => false,
-            'pasta_dados' => __DIR__ . '/storage',
-            'fuso_horario' => 'America/Sao_Paulo',
-            // Código exigido no cadastro público de organizadores. Em produção, troque-o em config.local.php.
-            'codigo_organizador' => 'FTC_OUR_26',
-            'db' => ['host' => '127.0.0.1', 'nome' => 'eventeen', 'usuario' => 'root', 'senha' => ''],
-            'email' => [
-                'transporte' => 'arquivo',
-                'remetente' => 'nao-responda@eventeen.local',
-                'nome_remetente' => 'Eventeen',
-                'smtp' => ['host' => '', 'porta' => 587, 'seguranca' => 'tls', 'usuario' => '', 'senha' => '', 'tempo_limite' => 15],
-            ],
-        ];
-        $arquivoLocal = __DIR__ . '/config.local.php';
-        if (is_file($arquivoLocal)) {
-            $local = require $arquivoLocal;
-            if (is_array($local)) {
-                $config = array_replace_recursive($config, $local);
-            }
-        }
-        foreach (['host' => 'EVENTEEN_DB_HOST', 'nome' => 'EVENTEEN_DB_NOME', 'usuario' => 'EVENTEEN_DB_USUARIO', 'senha' => 'EVENTEEN_DB_SENHA'] as $campo => $variavel) {
-            $valor = getenv($variavel);
-            if ($valor !== false) {
-                $config['db'][$campo] = $valor;
-            }
-        }
-        if (getenv('EVENTEEN_AMBIENTE') !== false) {
-            $config['ambiente'] = getenv('EVENTEEN_AMBIENTE');
-        }
-        if (!in_array($config['ambiente'], ['desenvolvimento', 'producao'], true)) {
-            // Sem configuração explícita, só se considera desenvolvimento quando
-            // o acesso vem da própria máquina; qualquer outro acesso é tratado
-            // como produção (erros ocultos).
-            $local = PHP_SAPI === 'cli' || in_array($_SERVER['REMOTE_ADDR'] ?? '', ['127.0.0.1', '::1'], true);
-            $config['ambiente'] = $local ? 'desenvolvimento' : 'producao';
-        }
-    }
-
-    return $chave === null ? $config : ($config[$chave] ?? null);
-}
-
-if (!@date_default_timezone_set((string) appConfig('fuso_horario'))) {
-    date_default_timezone_set('America/Sao_Paulo');
-}
-
-function appEmProducao(): bool
-{
-    return appConfig('ambiente') === 'producao';
-}
-
-function appPastaDados(string $subpasta): string
-{
-    $pasta = rtrim((string) appConfig('pasta_dados'), '/\\') . '/' . $subpasta;
-    if (!is_dir($pasta)) {
-        @mkdir($pasta, 0770, true);
-    }
-
-    return $pasta;
-}
-
-function requisicaoHttps(): bool
-{
-    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
-        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https' && appConfig('forcar_https'));
-}
+require_once __DIR__ . '/includes/base.php';
+require_once __DIR__ . '/includes/pagina.php';
 
 /*
  * Limites de tamanho das entradas (proteção contra envio de dados excessivos).
@@ -122,12 +49,7 @@ function validarTamanhoRequisicao(): void
         return true;
     };
     if ($excesso || !$verificar($_GET, 0) || !$verificar($_POST, 0)) {
-        http_response_code(413);
-        header('Content-Type: text/html; charset=UTF-8');
-        exit('<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Dados grandes demais | Eventeen</title></head>'
-            . '<body style="font-family:system-ui,sans-serif;max-width:32rem;margin:15vh auto;padding:0 1rem">'
-            . '<h1 style="color:#c0172d">Dados grandes demais</h1>'
-            . '<p>O formulário enviado excede o tamanho permitido. Volte, revise os campos e tente novamente.</p></body></html>');
+        encerrarComErro(413);
     }
 }
 
@@ -167,17 +89,7 @@ if (appEmProducao()) {
     if (PHP_SAPI !== 'cli') {
         set_exception_handler(static function (Throwable $erro): void {
             error_log('Erro não tratado: ' . $erro);
-            if (!headers_sent()) {
-                http_response_code(500);
-                header('Content-Type: text/html; charset=UTF-8');
-            }
-            echo '<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">'
-                . '<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Erro | Eventeen: do convite ao certificado</title></head>'
-                . '<body style="font-family:system-ui,sans-serif;max-width:32rem;margin:15vh auto;padding:0 1rem;color:#1f2937">'
-                . '<h1 style="color:#c0172d">Algo deu errado</h1>'
-                . '<p>Não foi possível concluir a operação agora. Tente novamente em alguns instantes.</p>'
-                . '<p>Se o problema continuar, avise a organização do evento.</p>'
-                . '<p><a href="' . h(applicationBasePath() . '/index.php') . '" style="color:#c0172d">Voltar ao início</a></p></body></html>';
+            encerrarComErro(500);
         });
     }
 } else {
@@ -223,11 +135,6 @@ $pdo = new PDO(
 // a mesma em que os horários dos eventos são cadastrados.
 $pdo->exec("SET time_zone = '" . date('P') . "'");
 
-function h(string|int|null $value): string
-{
-    return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-}
-
 function csrfToken(): string
 {
     if (empty($_SESSION['csrf_token'])) {
@@ -241,8 +148,7 @@ function validateCsrfToken(): void
 {
     $token = $_POST['csrf_token'] ?? '';
     if (!is_string($token) || !hash_equals(csrfToken(), $token)) {
-        http_response_code(400);
-        exit('Solicitação inválida. Atualize a página e tente novamente.');
+        encerrarComErro(400, 'A página ficou aberta por muito tempo ou a solicitação não pôde ser confirmada. Atualize a página e tente novamente.');
     }
 }
 
@@ -374,55 +280,6 @@ function requireLogin(): array
     return $_SESSION['usuario'];
 }
 
-function applicationBaseUrl(): string
-{
-    // Em produção, links enviados por e-mail ou impressos em certificados usam
-    // o endereço configurado, e não o cabeçalho Host da requisição.
-    $urlConfigurada = trim((string) appConfig('url_base'));
-    if ($urlConfigurada !== '') {
-        return rtrim($urlConfigurada, '/');
-    }
-
-    $https = requisicaoHttps();
-    $host = (string) ($_SERVER['HTTP_HOST'] ?? 'localhost');
-    if (!preg_match('/^[A-Za-z0-9.\-]+(?::\d{1,5})?$/', $host)) {
-        $host = 'localhost';
-    }
-
-    return ($https ? 'https' : 'http') . '://' . $host . applicationBasePath();
-}
-
-function applicationRootPrefix(): string
-{
-    $scriptDirectory = applicationScriptDirectory();
-    $scriptDirectory = rtrim($scriptDirectory, '/');
-    $ultimaBarra = strrpos($scriptDirectory, '/');
-    $pastaAtual = $ultimaBarra === false ? $scriptDirectory : substr($scriptDirectory, $ultimaBarra + 1);
-    return in_array($pastaAtual, ['participante', 'organizador', 'administrador'], true) ? '../' : '';
-}
-
-function applicationBasePath(): string
-{
-    $scriptDirectory = applicationScriptDirectory();
-    $normalizedDirectory = rtrim($scriptDirectory, '/');
-    $ultimaBarra = strrpos($normalizedDirectory, '/');
-    $pastaAtual = $ultimaBarra === false ? $normalizedDirectory : substr($normalizedDirectory, $ultimaBarra + 1);
-
-    if (in_array($pastaAtual, ['participante', 'organizador', 'administrador'], true)) {
-        $scriptDirectory = $ultimaBarra === false ? '' : substr($normalizedDirectory, 0, $ultimaBarra);
-    }
-
-    return $scriptDirectory === '/' || $scriptDirectory === '.' ? '' : rtrim($scriptDirectory, '/');
-}
-
-function applicationScriptDirectory(): string
-{
-    $scriptPath = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? ''));
-    $ultimaBarra = strrpos($scriptPath, '/');
-
-    return $ultimaBarra === false ? '' : substr($scriptPath, 0, $ultimaBarra);
-}
-
 function profileHomePath(?string $perfil): string
 {
     return match ($perfil) {
@@ -522,7 +379,7 @@ function appHeader(array $usuario): void
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
     <header class="app-topbar">
         <a class="app-brand" href="<?= h($paginaInicial) ?>" aria-label="Eventeen - página inicial">
-            <span class="app-brand__mark" aria-hidden="true">E</span>
+            <img class="app-brand__mark" src="<?= h(urlRecurso('img/eventeen-marca.png')) ?>" alt="" width="28" height="32">
             <span class="app-brand__name">Eventeen</span>
         </a>
         <div class="app-topbar__actions">

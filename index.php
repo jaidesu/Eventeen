@@ -42,14 +42,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#c0172d">
-    <title>Entrar | Eventeen: do convite ao certificado</title>
+    <?php renderHeadPagina('Eventeen: do convite ao certificado | Eventos acadêmicos da Fatec Ourinhos', ['titulo_completo' => true, 'indexar' => true, 'canonico' => '/', 'dados_estruturados' => true]); ?>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <main class="auth-page">
         <a class="marca" href="index.php" aria-label="Eventeen - página inicial">
-            <img class="logo" src="img/logo-eventeen.png" alt="Eventeen">
+            <img class="logo" src="img/logo-eventeen-web.png" alt="Eventeen" width="190" height="68">
         </a>
 
         <section class="auth-card" aria-labelledby="titulo">
@@ -89,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <p class="rodape">Ainda não tem conta? <a href="cadastro.php">Criar conta</a></p>
             <p class="rodape">Recebeu um certificado? <a href="validar-certificado.php">Validar certificado</a></p>
+            <?php renderInstalarApp(); ?>
         </section>
 
         <footer class="assinatura">Fatec Ourinhos</footer>

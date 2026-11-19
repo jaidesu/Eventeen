@@ -78,8 +78,7 @@ if ($eventoId !== null) {
         }
     }
     if ($eventoAtual === null) {
-        http_response_code(404);
-        exit('Evento não encontrado ou você não tem permissão para acessá-lo.');
+        encerrarComErro(404, 'Evento não encontrado ou você não tem permissão para acessá-lo.');
     }
 
     $consulta = $pdo->prepare(
@@ -99,8 +98,7 @@ if ($eventoId !== null) {
         $consulta->execute(['id' => $editarId, 'evento_id' => $eventoId]);
         $espaco = $consulta->fetch();
         if (!$espaco) {
-            http_response_code(404);
-            exit('Espaço não encontrado neste evento.');
+            encerrarComErro(404, 'Espaço não encontrado neste evento.');
         }
         $form = [
             'nome' => (string) $espaco['nome'],

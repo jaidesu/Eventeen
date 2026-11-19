@@ -20,8 +20,7 @@ $totalCertificados = count(array_filter($atividadesHistorico, static fn (array $
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#c0172d">
-    <title>Histórico e certificados | Eventeen: do convite ao certificado</title>
+    <?php renderHeadPagina('Histórico e certificados'); ?>
     <link rel="stylesheet" href="<?= h(applicationBasePath()) ?>/css/style.css">
 </head>
 <body class="app-body">

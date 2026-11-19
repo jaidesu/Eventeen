@@ -1,0 +1,45 @@
+{
+    "id": "./",
+    "name": "Eventeen: do convite ao certificado",
+    "short_name": "Eventeen",
+    "description": "Eventos acadêmicos da Fatec Ourinhos: inscrições, presença e certificados em um só lugar.",
+    "lang": "pt-BR",
+    "dir": "ltr",
+    "start_url": "./index.php?origem=app",
+    "scope": "./",
+    "display": "standalone",
+    "display_override": ["standalone", "minimal-ui"],
+    "orientation": "any",
+    "background_color": "#f7f6f9",
+    "theme_color": "#c0172d",
+    "categories": ["education", "productivity"],
+    "icons": [
+        { "src": "img/icones/icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+        { "src": "img/icones/icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+        { "src": "img/icones/icone-maskable-192.png", "sizes": "192x192", "type": "image/png", "purpose": "maskable" },
+        { "src": "img/icones/icone-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    ],
+    "shortcuts": [
+        {
+            "name": "Eventos",
+            "short_name": "Eventos",
+            "description": "Consultar os eventos abertos para inscrição",
+            "url": "./eventos.php",
+            "icons": [{ "src": "img/icones/icone-192.png", "sizes": "192x192", "type": "image/png" }]
+        },
+        {
+            "name": "Minhas inscrições",
+            "short_name": "Inscrições",
+            "description": "Ver e gerenciar suas inscrições",
+            "url": "./minhas-inscricoes.php",
+            "icons": [{ "src": "img/icones/icone-192.png", "sizes": "192x192", "type": "image/png" }]
+        },
+        {
+            "name": "Validar certificado",
+            "short_name": "Validar",
+            "description": "Conferir a autenticidade de um certificado",
+            "url": "./validar-certificado.php",
+            "icons": [{ "src": "img/icones/icone-192.png", "sizes": "192x192", "type": "image/png" }]
+        }
+    ]
+}

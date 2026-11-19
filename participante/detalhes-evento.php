@@ -35,8 +35,7 @@ $consulta = $pdo->prepare(
 $consulta->execute(['usuario_id' => (int) $usuario['id'], 'id' => $eventoId]);
 $evento = $consulta->fetch();
 if (!$evento) {
-    http_response_code(404);
-    exit('Evento não encontrado.');
+    encerrarComErro(404, 'Evento não encontrado.');
 }
 $vagas = $evento['capacidade'] === null ? null : max(0, (int) $evento['capacidade'] - (int) $evento['inscritos']);
 
@@ -59,8 +58,7 @@ $programacao = $consulta->fetchAll();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#c0172d">
-    <title><?= h($evento['titulo']) ?> | Eventeen: do convite ao certificado</title>
+    <?php renderHeadPagina((string) $evento['titulo']); ?>
     <link rel="stylesheet" href="<?= h(applicationBasePath()) ?>/css/style.css">
 </head>
 <body class="app-body">

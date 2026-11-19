@@ -30,8 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $codigoRecebido = $_GET['codigo'] ?? '';
 $certificado = is_string($codigoRecebido) ? buscarCertificadoPorCodigo($pdo, mb_substr($codigoRecebido, 0, 24, 'UTF-8')) : null;
 if ($certificado === null || !organizadorGerenciaEvento($pdo, $organizadorId, (int) $certificado['evento_id'])) {
-    http_response_code(404);
-    exit('Certificado não encontrado ou você não tem permissão para acessá-lo.');
+    encerrarComErro(404, 'Certificado não encontrado ou você não tem permissão para acessá-lo.');
 }
 
 $pdf = gerarPdfCertificado($certificado, applicationBaseUrl() . '/validar-certificado.php');

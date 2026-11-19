@@ -12,14 +12,18 @@ $certificado = $codigo !== '' ? buscarCertificadoPorCodigo($pdo, $codigo) : null
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#c0172d">
-    <title>Validar certificado | Eventeen: do convite ao certificado</title>
+    <?php renderHeadPagina('Validar certificado', [
+        // Resultados de validação mostram o nome do participante: só a página vazia aparece nos buscadores.
+        'indexar' => $codigo === '',
+        'canonico' => '/validar-certificado.php',
+        'descricao' => 'Confira a autenticidade de um certificado emitido pelo Eventeen informando o código impresso no documento.',
+    ]); ?>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <main class="auth-page">
         <a class="marca" href="index.php" aria-label="Eventeen - página inicial">
-            <img class="logo" src="img/logo-eventeen.png" alt="Eventeen">
+            <img class="logo" src="img/logo-eventeen-web.png" alt="Eventeen" width="190" height="68">
         </a>
 
         <section class="auth-card" aria-labelledby="titulo">

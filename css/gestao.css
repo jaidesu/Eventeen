@@ -39,14 +39,10 @@
 }
 
 .management-brand__mark {
-    display: grid;
-    width: 36px;
-    height: 36px;
-    place-items: center;
-    border-radius: 10px;
-    background: var(--vermelho);
-    color: #fff;
-    font-size: 22px;
+    display: block;
+    width: auto;
+    height: 38px;
+    flex: none;
 }
 
 .management-topbar__right {
@@ -681,8 +677,7 @@
     }
 
     .management-brand__mark {
-        width: 32px;
-        height: 32px;
+        height: 34px;
     }
 
     .management-topbar__right {

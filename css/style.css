@@ -387,16 +387,10 @@ body.app-body {
 }
 
 .app-brand__mark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 30px;
-    height: 30px;
-    border-radius: 9px;
-    background: var(--vermelho);
-    color: var(--branco);
-    font-size: 19px;
-    font-weight: 700;
+    display: block;
+    width: auto;
+    height: 32px;
+    flex: none;
 }
 
 .app-brand__name {
@@ -1065,9 +1059,7 @@ body.app-body {
     }
 
     .app-brand__mark {
-        width: 36px;
-        height: 36px;
-        font-size: 22px;
+        height: 38px;
     }
 
     .app-brand__name {
@@ -1597,4 +1589,56 @@ a.botao {
     align-items: center;
     justify-content: center;
     text-decoration: none;
+}
+
+/* Páginas de erro (404, 403, 500...) */
+.erro-card {
+    text-align: center;
+}
+
+.erro-codigo {
+    margin: 0 0 6px;
+    color: var(--vermelho);
+    font-size: clamp(64px, 18vw, 96px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -.05em;
+}
+
+.erro-acoes {
+    display: grid;
+    gap: 12px;
+    margin-top: 26px;
+}
+
+.botao--secundario {
+    border: 1px solid var(--borda);
+    background: var(--branco);
+    color: var(--texto);
+}
+
+.botao--secundario:hover {
+    border-color: var(--vermelho);
+    background: var(--rosa-claro);
+    color: var(--vermelho-escuro);
+}
+
+/* Instalação do aplicativo (PWA) */
+.instalar-app {
+    display: grid;
+    gap: 8px;
+    margin-top: 18px;
+    text-align: center;
+}
+
+[data-instalar-app][hidden],
+[data-instalar-app] [hidden] {
+    display: none !important;
+}
+
+.instalar-app__dica {
+    margin: 0;
+    color: var(--cinza);
+    font-size: 14px;
+    line-height: 1.5;
 }

@@ -76,8 +76,7 @@ if ($eventoId !== null) {
         }
     }
     if (!$eventoEncontrado) {
-        http_response_code(404);
-        exit('Evento não encontrado ou você não tem permissão para acessá-lo.');
+        encerrarComErro(404, 'Evento não encontrado ou você não tem permissão para acessá-lo.');
     }
 
     $consulta = $pdo->prepare(
@@ -98,8 +97,7 @@ if ($eventoId !== null) {
         $consulta->execute(['id' => $editarId, 'evento_id' => $eventoId]);
         $palestrante = $consulta->fetch();
         if (!$palestrante) {
-            http_response_code(404);
-            exit('Palestrante não encontrado neste evento.');
+            encerrarComErro(404, 'Palestrante não encontrado neste evento.');
         }
         $form = [
             'nome' => (string) $palestrante['nome'],

@@ -88,8 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     } else {
-        http_response_code(400);
-        exit('Ação inválida.');
+        encerrarComErro(400, 'Ação inválida.');
     }
 
     $dadosConta['nome'] = $nome ?? $dadosConta['nome'];
@@ -109,8 +108,7 @@ $prefixo = applicationRootPrefix();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#c0172d">
-    <title>Configurações da conta | Eventeen: do convite ao certificado</title>
+    <?php renderHeadPagina('Configurações da conta'); ?>
     <link rel="stylesheet" href="<?= h(applicationBasePath()) ?>/css/style.css">
 </head>
 <body class="app-body">
@@ -181,6 +179,15 @@ $prefixo = applicationRootPrefix();
                         <button class="botao" type="submit">Alterar senha</button>
                     </div>
                 </form>
+            </section>
+
+            <section class="account-settings-card" aria-labelledby="app-eventeen" data-instalar-app hidden>
+                <header class="account-settings-card__header">
+                    <h2 id="app-eventeen">App Eventeen</h2>
+                    <p>Instale o Eventeen no celular ou no computador para abrir direto da tela inicial, como um aplicativo.</p>
+                </header>
+                <button class="botao" type="button" data-instalar-app-botao hidden>Instalar o app</button>
+                <p class="instalar-app__dica" data-instalar-app-ios hidden>No iPhone ou iPad, toque em <strong>Compartilhar</strong> e depois em <strong>Adicionar à Tela de Início</strong>.</p>
             </section>
         </main>
         <?php if ($dadosConta['perfil'] === 'participante'): ?>

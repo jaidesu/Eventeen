@@ -35,8 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#c0172d">
-    <title>Cancelar inscrição | Eventeen: do convite ao certificado</title>
+    <?php renderHeadPagina('Cancelar inscrição'); ?>
     <link rel="stylesheet" href="<?= h(applicationBasePath()) ?>/css/style.css">
 </head>
 <body class="app-body">

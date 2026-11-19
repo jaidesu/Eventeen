@@ -1,0 +1,17 @@
+# Eventeen: do convite ao certificado
+# Áreas internas exigem login e não devem aparecer nos buscadores.
+User-agent: *
+Allow: /
+Disallow: /participante/
+Disallow: /organizador/
+Disallow: /administrador/
+Disallow: /includes/
+Disallow: /tests/
+Disallow: /docs/
+Disallow: /storage/
+Disallow: /configuracoes-conta.php
+Disallow: /redefinir-senha.php
+Disallow: /sair.php
+Disallow: /erro.php
+
+Sitemap: https://eventeen.com.br/sitemap.xml

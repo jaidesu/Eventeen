@@ -12,8 +12,7 @@ if ($contaId === false || $contaId < 1) {
 }
 $conta = buscarUsuario($pdo, $contaId);
 if ($conta === null) {
-    http_response_code(404);
-    exit('Usuário não encontrado.');
+    encerrarComErro(404, 'Usuário não encontrado.');
 }
 
 $mensagem = null;

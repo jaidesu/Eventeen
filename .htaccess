@@ -1,0 +1,54 @@
+# Configuração do Apache para o Eventeen (exige AllowOverride com Options, FileInfo e Indexes).
+
+DirectoryIndex index.php
+# Não lista o conteúdo das pastas (ex.: /img/); o acesso cai na página 403.
+Options -Indexes
+
+# ---------------------------------------------------------------------------
+# Páginas de erro do Eventeen (erro.php descobre o código pelo REDIRECT_STATUS).
+# O caminho parte da raiz do domínio (https://eventeen.com.br/erro.php).
+# Com o sistema numa subpasta, ajuste o caminho; no XAMPP: /Eventeen/erro.php
+# ---------------------------------------------------------------------------
+ErrorDocument 400 /erro.php
+ErrorDocument 401 /erro.php
+ErrorDocument 403 /erro.php
+ErrorDocument 404 /erro.php
+ErrorDocument 405 /erro.php
+ErrorDocument 408 /erro.php
+ErrorDocument 413 /erro.php
+ErrorDocument 429 /erro.php
+ErrorDocument 500 /erro.php
+ErrorDocument 502 /erro.php
+ErrorDocument 503 /erro.php
+ErrorDocument 504 /erro.php
+
+# Arquivos e pastas internos não são servidos pela web (resposta 403).
+<IfModule mod_alias.c>
+    RedirectMatch 403 (?i)/(includes|tests|docs|storage|\.git|\.vscode|\.claude)(/|$)
+    RedirectMatch 403 (?i)/(banco\.sql|config\.local\.php|config\.exemplo\.php|README\.md|\.gitignore)$
+</IfModule>
+
+# ---------------------------------------------------------------------------
+# PWA e desempenho
+# ---------------------------------------------------------------------------
+<IfModule mod_mime.c>
+    AddType application/manifest+json .webmanifest
+    AddType application/json .json
+    AddType image/x-icon .ico
+    AddCharset UTF-8 .html .css .js .json .txt .xml
+</IfModule>
+
+<IfModule mod_headers.c>
+    # O service worker e o manifesto precisam ser conferidos a cada visita para que as atualizações cheguem.
+    <FilesMatch "^(sw\.js|manifest\.json)$">
+        Header set Cache-Control "no-cache"
+    </FilesMatch>
+    # Imagens e ícones mudam pouco: cache de 30 dias.
+    <FilesMatch "\.(png|jpe?g|gif|webp|svg|ico)$">
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml application/xml application/javascript text/javascript application/json application/manifest+json image/svg+xml image/x-icon
+</IfModule>

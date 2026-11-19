@@ -71,8 +71,7 @@ function renderManagementStart(array $usuario, string $titulo, string $descricao
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="theme-color" content="#c0172d">
-        <title><?= h($titulo) ?> | Eventeen: do convite ao certificado</title>
+        <?php renderHeadPagina($titulo); ?>
         <link rel="stylesheet" href="../css/style.css">
         <link rel="stylesheet" href="../css/gestao.css">
     </head>
@@ -81,7 +80,7 @@ function renderManagementStart(array $usuario, string $titulo, string $descricao
         <div class="management-layout">
             <header class="management-topbar">
                 <a class="management-brand" href="<?= h($inicio) ?>" aria-label="Eventeen - início da <?= h(mb_strtolower($tituloPerfil, 'UTF-8')) ?>">
-                    <span class="management-brand__mark" aria-hidden="true">E</span>
+                    <img class="management-brand__mark" src="<?= h(urlRecurso('img/eventeen-marca.png')) ?>" alt="" width="33" height="38">
                     <span>Eventeen</span>
                 </a>
                 <div class="management-topbar__right">
