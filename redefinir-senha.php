@@ -75,7 +75,7 @@ $usuarioDoLink = usuarioDoTokenRedefinicao($pdo, $token);
             <?php endif; ?>
         </section>
 
-        <footer class="assinatura">Fatec Ourinhos</footer>
+        <?php renderAssinaturaAcesso(); ?>
     </main>
 </body>
 </html>

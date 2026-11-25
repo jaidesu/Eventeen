@@ -273,19 +273,6 @@ function landingValor(array $evento): string
         </section>
     </main>
 
-    <footer class="lp-rodape">
-        <div class="lp-container lp-rodape__grade">
-            <div>
-                <img src="img/logo-eventeen-web.png" alt="Eventeen" width="130" height="47">
-                <p>Do convite ao certificado.</p>
-            </div>
-            <nav aria-label="Links do rodapé">
-                <a href="entrar.php">Entrar</a>
-                <a href="cadastro.php">Criar conta</a>
-                <a href="validar-certificado.php">Validar certificado</a>
-            </nav>
-            <p class="lp-rodape__assinatura">Fatec Ourinhos · Análise e Desenvolvimento de Sistemas · <?= date('Y') ?></p>
-        </div>
-    </footer>
+    <?php renderRodapePublico(); ?>
 </body>
 </html>

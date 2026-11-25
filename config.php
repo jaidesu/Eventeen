@@ -96,21 +96,7 @@ if (appEmProducao()) {
     ini_set('display_errors', '1');
 }
 
-if (PHP_SAPI !== 'cli') {
-    if (appEmProducao() && appConfig('forcar_https') && !requisicaoHttps()) {
-        $hostAtual = (string) ($_SERVER['HTTP_HOST'] ?? '');
-        if (preg_match('/^[A-Za-z0-9.\-]+(?::\d{1,5})?$/', $hostAtual)) {
-            header('Location: https://' . $hostAtual . ($_SERVER['REQUEST_URI'] ?? '/'), true, 301);
-            exit;
-        }
-    }
-    header('X-Content-Type-Options: nosniff');
-    header('X-Frame-Options: SAMEORIGIN');
-    header('Referrer-Policy: same-origin');
-    if (requisicaoHttps()) {
-        header('Strict-Transport-Security: max-age=31536000');
-    }
-}
+prepararRespostaHttp();
 
 session_set_cookie_params([
     'httponly' => true,

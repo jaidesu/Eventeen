@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php endif; ?>
         </section>
 
-        <footer class="assinatura">Fatec Ourinhos</footer>
+        <?php renderAssinaturaAcesso(); ?>
     </main>
 </body>
 </html>

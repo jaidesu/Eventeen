@@ -99,6 +99,49 @@ function renderInstalarApp(string $classe = 'instalar-app'): void
     <?php
 }
 
+/** E-mail de contato publicado nos Termos de Uso e na Política de Privacidade ('' quando não configurado). */
+function emailContato(): string
+{
+    $email = trim((string) appConfig('email_contato'));
+
+    return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : '';
+}
+
+/** Rodapé das páginas públicas (página inicial e documentos legais). */
+function renderRodapePublico(): void
+{
+    ?>
+    <footer class="lp-rodape">
+        <div class="lp-container lp-rodape__grade">
+            <div>
+                <img src="<?= h(urlRecurso('img/logo-eventeen-web.png')) ?>" alt="Eventeen" width="130" height="47">
+                <p>Do convite ao certificado.</p>
+            </div>
+            <nav aria-label="Links do rodapé">
+                <a href="<?= h(urlRecurso('entrar.php')) ?>">Entrar</a>
+                <a href="<?= h(urlRecurso('cadastro.php')) ?>">Criar conta</a>
+                <a href="<?= h(urlRecurso('validar-certificado.php')) ?>">Validar certificado</a>
+                <a href="<?= h(urlRecurso('termos-de-uso.php')) ?>">Termos de uso</a>
+                <a href="<?= h(urlRecurso('politica-de-privacidade.php')) ?>">Política de privacidade</a>
+            </nav>
+            <p class="lp-rodape__assinatura">Fatec Ourinhos · Análise e Desenvolvimento de Sistemas · <?= date('Y') ?></p>
+        </div>
+    </footer>
+    <?php
+}
+
+/** Assinatura das telas de acesso (login, recuperação de senha, erros), com os links legais. */
+function renderAssinaturaAcesso(): void
+{
+    ?>
+    <footer class="assinatura">
+        Fatec Ourinhos ·
+        <a href="<?= h(urlRecurso('termos-de-uso.php')) ?>">Termos de uso</a> ·
+        <a href="<?= h(urlRecurso('politica-de-privacidade.php')) ?>">Privacidade</a>
+    </footer>
+    <?php
+}
+
 /** Dados estruturados (schema.org) do site, para os buscadores entenderem o que é o Eventeen. */
 function dadosEstruturadosSite(): string
 {
@@ -200,7 +243,7 @@ function renderPaginaErro(int $codigo, ?string $mensagem = null): void
             <?php endif; ?>
         </section>
 
-        <footer class="assinatura">Fatec Ourinhos</footer>
+        <?php renderAssinaturaAcesso(); ?>
     </main>
     <script>
         (function () {

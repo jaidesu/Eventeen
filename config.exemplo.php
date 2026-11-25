@@ -21,6 +21,10 @@ return [
     // (aí só o administrador concede o perfil de organizador).
     'codigo_organizador' => 'troque-este-codigo',
 
+    // E-mail de contato exibido nos Termos de Uso e na Política de Privacidade
+    // (dúvidas e pedidos sobre dados pessoais). Deixe '' para não exibir.
+    'email_contato' => 'contato@eventeen.com.br',
+
     // Fuso horário dos eventos (o banco é ajustado para o mesmo fuso).
     'fuso_horario' => 'America/Sao_Paulo',
 

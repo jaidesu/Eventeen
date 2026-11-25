@@ -26,6 +26,8 @@ function appConfig(?string $chave = null): mixed
             'fuso_horario' => 'America/Sao_Paulo',
             // Código exigido no cadastro público de organizadores. Em produção, troque-o em config.local.php.
             'codigo_organizador' => 'FTC_OUR_26',
+            // E-mail publicado nos Termos de Uso e na Política de Privacidade para dúvidas e pedidos sobre dados.
+            'email_contato' => '',
             'db' => ['host' => '127.0.0.1', 'nome' => 'eventeen', 'usuario' => 'root', 'senha' => ''],
             'email' => [
                 'transporte' => 'arquivo',
@@ -139,4 +141,25 @@ function applicationScriptDirectory(): string
     $ultimaBarra = strrpos($scriptPath, '/');
 
     return $ultimaBarra === false ? '' : substr($scriptPath, 0, $ultimaBarra);
+}
+
+/** Redireciona para HTTPS (quando configurado) e envia os cabeçalhos de segurança da resposta. */
+function prepararRespostaHttp(): void
+{
+    if (PHP_SAPI === 'cli' || headers_sent()) {
+        return;
+    }
+    if (appEmProducao() && appConfig('forcar_https') && !requisicaoHttps()) {
+        $hostAtual = (string) ($_SERVER['HTTP_HOST'] ?? '');
+        if (preg_match('/^[A-Za-z0-9.\-]+(?::\d{1,5})?$/', $hostAtual)) {
+            header('Location: https://' . $hostAtual . ($_SERVER['REQUEST_URI'] ?? '/'), true, 301);
+            exit;
+        }
+    }
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: same-origin');
+    if (requisicaoHttps()) {
+        header('Strict-Transport-Security: max-age=31536000');
+    }
 }

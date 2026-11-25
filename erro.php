@@ -14,13 +14,9 @@ $status = (int) ($_SERVER['REDIRECT_STATUS'] ?? 0);
 $codigoInformado = $_GET['codigo'] ?? '';
 $codigo = $status >= 400 ? $status : (is_string($codigoInformado) && ctype_digit($codigoInformado) ? (int) $codigoInformado : 404);
 
-if (!headers_sent()) {
-    header('X-Content-Type-Options: nosniff');
-    header('X-Frame-Options: SAMEORIGIN');
-    header('Referrer-Policy: same-origin');
-    if ($codigo === 503) {
-        header('Retry-After: 600');
-    }
+prepararRespostaHttp();
+if ($codigo === 503 && !headers_sent()) {
+    header('Retry-After: 600');
 }
 
 encerrarComErro(codigoErroHttpValido($codigo));

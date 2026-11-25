@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif (($erroSenha = erroNovaSenha($senha, $confirmacao)) !== null) {
         $erro = $erroSenha;
     } elseif (!isset($_POST['termos'])) {
-        $erro = 'É necessário concordar com os termos de uso.';
+        $erro = 'É necessário concordar com os Termos de Uso e a Política de Privacidade.';
     } elseif ($perfil === 'organizador' && !codigoOrganizadorValido($codigoOrganizador)) {
         $erro = 'O código de organizador é inválido.';
     } else {
@@ -137,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <label class="checkbox-linha checkbox-linha--termos" for="termos">
                     <input type="checkbox" id="termos" name="termos" required>
-                    <span>Concordo com os <strong>termos de uso</strong> <span class="campo-obrigatorio" aria-hidden="true">*</span></span>
+                    <span>Li e concordo com os <a href="termos-de-uso.php" target="_blank" rel="noopener">Termos de Uso</a> e a <a href="politica-de-privacidade.php" target="_blank" rel="noopener">Política de Privacidade</a> <span class="campo-obrigatorio" aria-hidden="true">*</span></span>
                 </label>
 
                 <button type="submit" class="botao">Criar conta</button>

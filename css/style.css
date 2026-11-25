@@ -1642,3 +1642,14 @@ a.botao {
     font-size: 14px;
     line-height: 1.5;
 }
+
+/* Links legais nas telas de acesso (login, recuperação de senha, erros) */
+.assinatura a {
+    color: inherit;
+}
+
+/* Cadastro: links dos documentos ao lado da caixa de concordância */
+.checkbox-linha--termos a {
+    color: var(--vermelho);
+    font-weight: 700;
+}

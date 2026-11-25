@@ -70,6 +70,7 @@ A partir daí, o administrador concede ou revoga os perfis de organizador e admi
 - `includes/base.php`: configuração (lê `config.local.php` quando existir; veja `config.exemplo.php`), endereços e escape de HTML, sem depender do banco.
 - `includes/pagina.php`: cabeçalho comum das páginas (título, SEO, ícones, PWA) e página de erro; `erro.php` exibe os erros 400, 403, 404, 405, 500, 503 e outros.
 - `manifest.json`, `sw.js`, `js/pwa.js` e `offline.html`: aplicativo instalável (PWA) e página exibida sem internet.
+- `termos-de-uso.php` e `politica-de-privacidade.php`: Termos de Uso e Política de Privacidade (versão preliminar), montados por `includes/documentos-legais.php` e estilizados por `css/legal.css`; não dependem do banco.
 - `robots.txt`, `sitemap.xml` e `.htaccess`: buscadores, páginas de erro do Apache, bloqueio de pastas internas e cache.
 - `img/`: logo, marca (cabeçalhos), imagem de compartilhamento e ícones (`img/icones/`); `favicon.ico` fica na raiz.
 - `participante/`: área do participante (início, eventos, detalhes, inscrições, cancelamento, histórico e certificado).
@@ -148,7 +149,7 @@ Sem configuração, os e-mails (recuperação de senha e confirmação de inscri
 
 Sem `config.local.php`, o sistema só se considera em desenvolvimento quando acessado da própria máquina (`localhost`); qualquer acesso externo é tratado como produção e não exibe erros técnicos.
 
-Antes de abrir ao público, também são necessários os documentos exigidos pela LGPD (política de privacidade e termos de uso) e um canal para o titular pedir a exclusão dos dados.
+Os Termos de Uso e a Política de Privacidade estão em versão preliminar (projeto acadêmico, sem revisão jurídica). Antes de abrir ao público ou de uma instituição adotar o sistema, revise-os com um profissional, ajuste as datas em `includes/documentos-legais.php` e informe em `email_contato` (no `config.local.php`) o e-mail que atende dúvidas e pedidos sobre dados pessoais. Sem esse e-mail, os documentos orientam o titular a procurar a organização do evento.
 
 ## Modelo de negócio e licença
 
