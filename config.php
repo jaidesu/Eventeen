@@ -233,7 +233,7 @@ function requireLogin(): array
 {
     global $pdo;
 
-    $paginaLogin = applicationRootPrefix() . 'index.php';
+    $paginaLogin = applicationRootPrefix() . 'entrar.php';
     if (empty($_SESSION['usuario']['id'])) {
         header('Location: ' . $paginaLogin);
         exit;

@@ -11,5 +11,5 @@ validateCsrfToken();
 
 encerrarSessao();
 
-header('Location: ' . applicationRootPrefix() . 'index.php');
+header('Location: ' . applicationRootPrefix() . 'entrar.php');
 exit;

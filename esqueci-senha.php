@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Se houver uma conta com o e-mail <strong><?= h($emailInformado) ?></strong>, enviamos um link para criar uma nova senha.
                     Ele vale por <?= REDEFINICAO_VALIDADE_MINUTOS ?> minutos. Confira também a caixa de spam.
                 </p>
-                <p class="rodape"><a href="index.php">Voltar para o login</a></p>
+                <p class="rodape"><a href="entrar.php">Voltar para o login</a></p>
             <?php else: ?>
                 <p class="auth-texto">Informe o e-mail da sua conta. Enviaremos um link para você escolher uma nova senha.</p>
 
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <button type="submit" class="botao">Enviar link</button>
                 </form>
 
-                <p class="rodape">Lembrou a senha? <a href="index.php">Entrar</a></p>
+                <p class="rodape">Lembrou a senha? <a href="entrar.php">Entrar</a></p>
             <?php endif; ?>
         </section>
 

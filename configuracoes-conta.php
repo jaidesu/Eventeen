@@ -15,7 +15,7 @@ $dadosConta = $consulta->fetch();
 if (!$dadosConta) {
     $_SESSION = [];
     session_destroy();
-    header('Location: index.php');
+    header('Location: entrar.php');
     exit;
 }
 $_SESSION['usuario']['nome'] = $dadosConta['nome'];

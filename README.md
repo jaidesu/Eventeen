@@ -8,14 +8,14 @@ Projeto da disciplina de Engenharia de Software II (ADS, 2026). A documentação
 
 - PHP 8.1 ou superior (PDO MySQL, mbstring e openssl), sem frameworks nem dependências externas.
 - MySQL 8 ou MariaDB 10.6+ (testado com o MariaDB do XAMPP e com MariaDB 11.4).
-- HTML e CSS responsivos (`css/style.css` para a área do participante e `css/gestao.css` para as áreas de gestão).
+- HTML e CSS responsivos (`css/style.css` para a área do participante, `css/gestao.css` para as áreas de gestão e `css/landing.css` para a página inicial).
 
 ## Configuração do banco de dados
 
 1. Inicie o Apache e o MySQL pelo XAMPP.
 2. No phpMyAdmin, abra **Importar**, selecione `banco.sql` e execute. O script cria o banco `eventeen`, as tabelas e dados de demonstração para usuários, eventos, programação, inscrições, certificados e financeiro.
 3. No XAMPP não é preciso configurar nada: o padrão é o usuário `root`, sem senha. Para outro ambiente, veja [Publicação em servidor](#publicação-em-servidor).
-4. Acesse `http://localhost/Eventeen/` e entre com uma conta de demonstração ou crie uma conta.
+4. Acesse `http://localhost/Eventeen/` (página inicial) e clique em **Entrar** para usar uma conta de demonstração ou crie uma conta.
 
 O arquivo também pode ser importado pelo terminal:
 
@@ -64,7 +64,8 @@ A partir daí, o administrador concede ou revoga os perfis de organizador e admi
 
 ## Organização do código
 
-- `index.php`, `cadastro.php`, `sair.php`, `esqueci-senha.php`, `redefinir-senha.php`, `configuracoes-conta.php` e `validar-certificado.php`: acesso, recuperação de senha, sessão, conta e validação pública de certificados.
+- `index.php`: página inicial pública (landing page) com apresentação, próximos eventos publicados e validação de certificado; quem já entrou vai direto para a sua área.
+- `entrar.php`, `cadastro.php`, `sair.php`, `esqueci-senha.php`, `redefinir-senha.php`, `configuracoes-conta.php` e `validar-certificado.php`: acesso, recuperação de senha, sessão, conta e validação pública de certificados.
 - `config.php`: conexão, sessão e funções comuns.
 - `includes/base.php`: configuração (lê `config.local.php` quando existir; veja `config.exemplo.php`), endereços e escape de HTML, sem depender do banco.
 - `includes/pagina.php`: cabeçalho comum das páginas (título, SEO, ícones, PWA) e página de erro; `erro.php` exibe os erros 400, 403, 404, 405, 500, 503 e outros.

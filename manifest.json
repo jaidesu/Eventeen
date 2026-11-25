@@ -5,7 +5,7 @@
     "description": "Eventos acadêmicos da Fatec Ourinhos: inscrições, presença e certificados em um só lugar.",
     "lang": "pt-BR",
     "dir": "ltr",
-    "start_url": "./index.php?origem=app",
+    "start_url": "./entrar.php?origem=app",
     "scope": "./",
     "display": "standalone",
     "display_override": ["standalone", "minimal-ui"],

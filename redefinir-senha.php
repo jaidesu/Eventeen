@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redefinirSenhaComToken($pdo, $token, (string) ($_POST['nova_senha'] ?? ''), (string) ($_POST['confirmar_senha'] ?? ''));
         // Uma sessão aberta neste navegador não deve continuar com a senha antiga.
         encerrarSessao();
-        header('Location: index.php?senha=redefinida');
+        header('Location: entrar.php?senha=redefinida');
         exit;
     } catch (DomainException $exception) {
         $erro = $exception->getMessage();
@@ -48,7 +48,7 @@ $usuarioDoLink = usuarioDoTokenRedefinicao($pdo, $token);
                 </p>
                 <p class="auth-texto">Os links valem por <?= REDEFINICAO_VALIDADE_MINUTOS ?> minutos e podem ser usados uma única vez.</p>
                 <a class="botao" href="esqueci-senha.php">Pedir um novo link</a>
-                <p class="rodape"><a href="index.php">Voltar para o login</a></p>
+                <p class="rodape"><a href="entrar.php">Voltar para o login</a></p>
             <?php else: ?>
                 <p class="auth-texto">Conta: <strong><?= h($usuarioDoLink['email']) ?></strong></p>
 
