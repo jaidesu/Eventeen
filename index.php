@@ -63,6 +63,7 @@ function landingValor(array $evento): string
     <?php renderHeadPagina('Eventeen: do convite ao certificado | Eventos acadêmicos da Fatec Ourinhos', ['titulo_completo' => true, 'indexar' => true, 'canonico' => '/', 'dados_estruturados' => true]); ?>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/landing.css">
+    <script src="js/apps.js" defer></script>
 </head>
 <body class="landing">
     <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
@@ -79,6 +80,46 @@ function landingValor(array $evento): string
                 <a href="#certificados">Certificados</a>
             </nav>
             <div class="lp-topo__acoes">
+                <div class="lp-apps">
+                    <button class="lp-apps__botao" type="button" aria-expanded="false" aria-controls="lp-apps-painel" aria-label="Apps da Eventeen" title="Apps da Eventeen">
+                        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+                            <g fill="currentColor">
+                                <circle cx="5" cy="5" r="2.1"/><circle cx="12" cy="5" r="2.1"/><circle cx="19" cy="5" r="2.1"/>
+                                <circle cx="5" cy="12" r="2.1"/><circle cx="12" cy="12" r="2.1"/><circle cx="19" cy="12" r="2.1"/>
+                                <circle cx="5" cy="19" r="2.1"/><circle cx="12" cy="19" r="2.1"/><circle cx="19" cy="19" r="2.1"/>
+                            </g>
+                        </svg>
+                    </button>
+                    <div class="lp-apps__painel" id="lp-apps-painel" role="dialog" aria-labelledby="lp-apps-titulo" hidden>
+                        <div class="lp-apps__cabecalho">
+                            <p class="lp-apps__titulo" id="lp-apps-titulo">Apps da Eventeen</p>
+                            <p class="lp-apps__subtitulo">Outros aplicativos feitos pela mesma equipe.</p>
+                        </div>
+                        <ul class="lp-apps__lista">
+                            <li>
+                                <a class="lp-app lp-app--moonspace" href="https://moonspace.eventeen.com.br" target="_blank" rel="noopener">
+                                    <span class="lp-app__icone"><img src="img/apps/moonspace.png" alt="" width="34" height="34"></span>
+                                    <span class="lp-app__texto">
+                                        <span class="lp-app__nome">Moonspace <span class="lp-app__tag">Rede social</span></span>
+                                        <span class="lp-app__descricao">A rede social noturna para conversar. Toda noite, às 20h, chega uma nova Pergunta da Noite.</span>
+                                        <span class="lp-app__endereco">moonspace.eventeen.com.br <span aria-hidden="true">↗</span></span>
+                                    </span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="lp-app lp-app--cifra" href="https://cifra.eventeen.com.br" target="_blank" rel="noopener">
+                                    <span class="lp-app__icone"><img src="img/apps/cifra.svg" alt="" width="52" height="52"></span>
+                                    <span class="lp-app__texto">
+                                        <span class="lp-app__nome">Cifra <span class="lp-app__tag">Finanças</span></span>
+                                        <span class="lp-app__descricao">Suas finanças pessoais sem planilha: o que entrou, o que saiu e o que falta pagar no mês.</span>
+                                        <span class="lp-app__endereco">cifra.eventeen.com.br <span aria-hidden="true">↗</span></span>
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
+                        <p class="lp-apps__rodape"><span class="lp-apps__ponto" aria-hidden="true"></span> Você está no <strong>Eventeen</strong></p>
+                    </div>
+                </div>
                 <a class="lp-link-entrar" href="entrar.php">Entrar</a>
                 <a class="lp-botao lp-botao--pequeno" href="cadastro.php">Criar conta</a>
             </div>
